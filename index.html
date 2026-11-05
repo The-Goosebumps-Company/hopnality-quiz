@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>What's your hop-nality? | hopnøsis</title>
+  <meta name="description" content="Seven questions. One flavour. Find your hopnøsis hop-nality.">
+  <meta name="theme-color" content="#0d0d0d">
+  <meta property="og:title" content="What's your hop-nality?">
+  <meta property="og:description" content="Seven questions. No wrong answers. A few questionable ones.">
+  <meta property="og:image" content="assets/can-classic.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app" aria-live="polite">
+
+    <!-- Welcome -->
+    <section class="screen screen--welcome is-active" data-screen="welcome">
+      <p class="wordmark">hopnøsis</p>
+      <div class="welcome__body">
+        <h1>What's your hop&#8209;nality?</h1>
+        <p class="lede">Seven questions. No wrong answers. A few questionable ones.</p>
+        <button class="btn btn--primary" data-action="start">Find out</button>
+      </div>
+      <p class="fineprint">Takes about a minute. Ø ALC | Ø CAL | Ø SUG</p>
+    </section>
+
+    <!-- Question -->
+    <section class="screen screen--question" data-screen="question">
+      <header class="qhead">
+        <button class="btn--back" data-action="back" aria-label="Previous question">←</button>
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="1">
+          <div class="progress__bar"></div>
+        </div>
+        <span class="progress__label"></span>
+      </header>
+      <h2 class="qtext"></h2>
+      <div class="answers"></div>
+    </section>
+
+    <!-- Loading -->
+    <section class="screen screen--loading" data-screen="loading">
+      <div class="bubbles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+      <p class="loading__text">Reading your bubbles…</p>
+    </section>
+
+    <!-- Result -->
+    <section class="screen screen--result" data-screen="result">
+      <p class="result__eyebrow">Your hop-nality is</p>
+      <article class="card">
+        <div class="card__photo"><img alt=""></div>
+        <h2 class="card__name"></h2>
+        <p class="card__words"></p>
+        <p class="card__wink"></p>
+      </article>
+      <p class="result__about"></p>
+      <div class="result__actions">
+        <a class="btn btn--primary" data-role="shop" target="_blank" rel="noopener"></a>
+        <button class="btn btn--ghost" data-action="share">Share your hop-nality</button>
+        <button class="btn btn--link" data-action="save-square">Save square image</button>
+      </div>
+      <p class="result__again">Not you today? Every version of you counts. <button class="btn--inline" data-action="restart">Take it again</button></p>
+      <footer class="result__foot">
+        <p class="hero-line"></p>
+        <p class="wordmark wordmark--small">hopnøsis</p>
+      </footer>
+    </section>
+
+  </main>
+  <div class="toast" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
