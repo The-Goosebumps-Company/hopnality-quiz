@@ -24,7 +24,9 @@ Then open http://localhost:8765. To jump straight to a result, add `?result=clas
 - **Save square image** builds a 1080×1080 image.
 
 ## Deploy
-Upload the `quiz/` folder to any static host on Kelly's/company hosting (cPanel, Netlify, Vercel, S3, and so on). Then:
+**Live:** https://the-goosebumps-company.github.io/hopnality-quiz/ (GitHub Pages, repo `The-Goosebumps-Company/hopnality-quiz`, `main` branch, root). Pushing to `main` redeploys within about a minute. The repo is public because the org is on the free plan.
+
+The folder can also go on any other static host (Kelly's/company hosting, Netlify, and so on). Then:
 1. Strip the Taplink page (taplink.cc/hopnosis.co.za) down to a welcome and one **"Fill in the quiz"** button pointing at the quiz URL. Add `?src=can` to the button link if we want to track it later.
 2. Scan a real can and check the whole path on a phone.
 
