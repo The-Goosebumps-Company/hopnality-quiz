@@ -1,13 +1,35 @@
 (() => {
-  const { flavours, questions, showdowns, heroLine, signOff, handle, hashtags } = window.HOPNALITY;
+  const H = window.HOPNALITY;
+  const { flavours, questions, showdowns, heroLine, signOff, handle, hashtags } = H;
   const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
   // showdown: key into `showdowns` while the tie-break question is on screen, else null.
   const state = { step: 0, picks: [], result: null, showdown: null };
+  const src = (new URLSearchParams(location.search).get("src") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
+
+  // ---------- Anonymous analytics (api/track.php) ----------
+  // One row per quiz run: start, finish, "Did we nail it?", insight answers, share/shop clicks.
+  // No personal data. Fails silently where there's no backend (e.g. the GitHub Pages preview).
+  let runId = null; // Promise<string|null>
+  function api(body) {
+    return fetch("api/track.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      keepalive: true,
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null);
+  }
+  function track(action, data = {}) {
+    if (!runId) return;
+    runId.then((id) => id && api({ action, id, ...data }));
+  }
 
   // ---------- Screens ----------
   function show(name) {
-    document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("is-active", s.dataset.screen === name));
+    $$(".screen").forEach((s) => s.classList.toggle("is-active", s.dataset.screen === name));
     window.scrollTo(0, 0);
   }
 
@@ -27,6 +49,7 @@
     $(".qtext", screen).textContent = q.q;
     $(".progress__bar", screen).style.width = `${state.showdown ? 100 : ((state.step + 1) / total) * 100}%`;
     $(".progress", screen).setAttribute("aria-valuenow", state.step + 1);
+    $(".progress", screen).setAttribute("aria-valuemax", total);
     $(".progress__label", screen).textContent = state.showdown ? "Tiebreak" : `${state.step + 1} of ${total}`;
     $(".btn--back", screen).disabled = state.step === 0 && !state.showdown;
 
@@ -41,7 +64,6 @@
       answers.appendChild(b);
     });
     show("question");
-    $(".qtext", screen).focus?.();
   }
 
   let locked = false;
@@ -52,8 +74,9 @@
     setTimeout(() => {
       locked = false;
       if (state.showdown) {
+        const pair = state.showdown;
         state.showdown = null;
-        reveal(flavour);
+        reveal(flavour, pair);
         return;
       }
       state.picks[state.step] = flavour;
@@ -66,28 +89,29 @@
     }, 260);
   }
 
-  // Returns the flavours with the top score: one winner, or the two tied at 3-3-1.
+  // Weighted tally (the brief: personality-led answers count more than occasion/channel ones).
+  // Returns the flavours with the top score: one winner, or the two tied.
   function leaders(picks) {
     const tally = { classic: 0, mango: 0, lime: 0 };
-    picks.forEach((f) => tally[f]++);
+    picks.forEach((f, i) => (tally[f] += questions[i].weight || 1));
     const top = Math.max(...Object.values(tally));
     return Object.keys(tally).filter((f) => tally[f] === top);
   }
 
   function finish() {
     const top = leaders(state.picks);
-    if (top.length === 1) return reveal(top[0]);
+    if (top.length === 1) return reveal(top[0], null);
     state.showdown = top.sort().join("-");
     renderQuestion();
   }
 
-  function reveal(flavour) {
+  function reveal(flavour, tiebreak) {
     state.result = flavour;
+    track("finish", { flavour, picks: state.picks.slice(0, questions.length), tiebreak });
     renderResult();
     show("loading");
     setTimeout(() => {
       document.body.dataset.flavour = state.result;
-      resetJoin();
       show("result");
     }, 1500);
   }
@@ -100,36 +124,113 @@
     img.alt = `A can of hopnøsis ${f.name}`;
     $(".card__name", screen).textContent = f.name;
     $(".card__name", screen).style.setProperty("--flav", state.result === "classic" ? f.theme.accent : f.theme.bg);
-    $(".card__words", screen).textContent = f.words;
-    $(".card__wink", screen).textContent = f.wink;
+    $(".card__words", screen).textContent = f.archetype;
+    $(".card__wink", screen).textContent = f.line;
     $(".result__about", screen).textContent = f.about;
     const shop = $('[data-role="shop"]', screen);
     shop.href = f.shop;
     shop.textContent = `Shop ${f.name}`;
     $(".hero-line", screen).textContent = heroLine;
+    resetPanels();
   }
 
-  function restart() {
+  function start() {
     state.step = 0;
     state.picks = [];
     state.result = null;
     state.showdown = null;
     delete document.body.dataset.flavour;
+    runId = api({ action: "start", source: src }).then((r) => (r && r.success ? r.data.id : null));
     renderQuestion();
   }
 
+  // ---------- Result panels: Did we nail it?, Mixed AF, insights ----------
+  function buildChips() {
+    const ins = H.insight;
+    const radio = (field, values) =>
+      values.map((v) => `<button type="button" class="chip" data-value="${v}" aria-pressed="false">${v}</button>`).join("");
+    $('[data-field="age_band"]').innerHTML = radio("age_band", ins.ageBands);
+    $('[data-field="city"]').innerHTML = radio("city", ins.cities);
+    $('[data-field="channels"]').innerHTML = ins.channels
+      .map(([v, label]) => `<button type="button" class="chip" data-value="${v}" aria-pressed="false">${label}</button>`)
+      .join("");
+    $(".insight__title").textContent = ins.title;
+    $(".mixed__line").textContent = H.mixed.line;
+    const mixed = $('[data-role="mixed"]');
+    mixed.textContent = H.mixed.label;
+    mixed.href = H.mixed.url;
+  }
+
+  function resetPanels() {
+    $$(".nail .chip").forEach((c) => c.classList.remove("is-on"));
+    $(".nail .chips").hidden = false;
+    $(".nail .panel__done").hidden = true;
+    const ins = $(".insight");
+    ins.reset();
+    ins.classList.remove("is-done");
+    $$(".chip", ins).forEach((c) => {
+      c.classList.remove("is-on");
+      c.setAttribute("aria-pressed", "false");
+    });
+    $(".panel__done", ins).hidden = true;
+    resetJoin();
+  }
+
+  // "Did we nail it?": one tap, saved straight away.
+  $$(".nail .chip").forEach((chip) =>
+    chip.addEventListener("click", () => {
+      $$(".nail .chip").forEach((c) => c.classList.toggle("is-on", c === chip));
+      track("nail", { value: chip.dataset.nail });
+      setTimeout(() => {
+        $(".nail .chips").hidden = true;
+        $(".nail .panel__done").hidden = false;
+      }, 250);
+    })
+  );
+
+  // Insight chips: single choice for age and city, multi for channels.
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest(".insight .chip");
+    if (!chip) return;
+    const group = chip.parentElement;
+    const multi = group.classList.contains("chips--check");
+    if (!multi) $$(".chip", group).forEach((c) => c !== chip && (c.classList.remove("is-on"), c.setAttribute("aria-pressed", "false")));
+    const on = !chip.classList.contains("is-on");
+    chip.classList.toggle("is-on", on);
+    chip.setAttribute("aria-pressed", String(on));
+  });
+
+  function insightDone(msg) {
+    const ins = $(".insight");
+    ins.classList.add("is-done");
+    const done = $(".panel__done", ins);
+    done.textContent = msg;
+    done.hidden = false;
+  }
+
+  $(".insight").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const val = (field) => $(`[data-field="${field}"] .chip.is-on`)?.dataset.value || null;
+    const channels = $$('[data-field="channels"] .chip.is-on').map((c) => c.dataset.value);
+    const suburb = $('.insight input[name="suburb"]').value.trim().slice(0, 60) || null;
+    const any = val("age_band") || val("city") || suburb || channels.length;
+    if (!any) return insightDone("All skipped. Fair enough.");
+    track("insight", { age_band: val("age_band"), city: val("city"), suburb, channels });
+    insightDone("Thanks. That's genuinely useful.");
+  });
+
   // ---------- Share card (canvas) ----------
   const imageCache = {};
-  function loadImage(src) {
-    if (!imageCache[src]) {
-      imageCache[src] = new Promise((resolve, reject) => {
+  function loadImage(srcUrl) {
+    if (!imageCache[srcUrl]) {
+      imageCache[srcUrl] = new Promise((resolve, reject) => {
         const i = new Image();
         i.onload = () => resolve(i);
         i.onerror = reject;
-        i.src = src;
+        i.src = srcUrl;
       });
     }
-    return imageCache[src];
+    return imageCache[srcUrl];
   }
 
   function wrap(ctx, text, maxWidth) {
@@ -162,7 +263,7 @@
     const f = flavours[key];
     const t = f.theme;
     const W = 1080;
-    const H = format === "story" ? 1920 : 1080;
+    const H2 = format === "story" ? 1920 : 1080;
     const FONT = '"Jost", "Futura", sans-serif';
 
     await Promise.all([
@@ -174,24 +275,24 @@
 
     const c = document.createElement("canvas");
     c.width = W;
-    c.height = H;
+    c.height = H2;
     const ctx = c.getContext("2d");
     const nameColour = key === "classic" ? t.accent : t.ink;
 
     ctx.fillStyle = t.bg;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(0, 0, W, H2);
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
     ctx.fillStyle = t.ink;
 
     const story = format === "story";
     const pad = story ? 90 : 70;
-    const photo = story ? { x: pad, y: 250, s: W - pad * 2 } : { x: (W - 520) / 2, y: 70, s: 520 };
+    const photo = story ? { x: pad, y: 250, s: W - pad * 2 } : { x: (W - 480) / 2, y: 60, s: 480 };
 
     if (story) {
       ctx.font = `700 40px ${FONT}`;
       ctx.letterSpacing = "8px";
-      ctx.fillText("MY HOP-NALITY IS", W / 2, 180);
+      ctx.fillText("WHAT THE AF AM I?", W / 2, 180);
       ctx.letterSpacing = "0px";
     }
 
@@ -201,25 +302,24 @@
     ctx.drawImage(img, photo.x, photo.y, photo.s, photo.s);
     ctx.restore();
 
-    let y = photo.y + photo.s + (story ? 170 : 130);
+    let y = photo.y + photo.s + (story ? 170 : 125);
     ctx.fillStyle = nameColour;
-    ctx.font = `800 ${story ? 160 : 120}px ${FONT}`;
+    ctx.font = `800 ${story ? 160 : 116}px ${FONT}`;
     ctx.fillText(f.name, W / 2, y);
 
     ctx.fillStyle = t.ink;
-    y += story ? 90 : 70;
-    ctx.font = `500 ${story ? 52 : 42}px ${FONT}`;
-    ctx.fillText(f.words, W / 2, y);
+    y += story ? 90 : 66;
+    ctx.font = `700 ${story ? 54 : 42}px ${FONT}`;
+    ctx.fillText(f.archetype, W / 2, y);
 
-    ctx.font = `italic 400 ${story ? 46 : 36}px ${FONT}`;
-    const winkLines = wrap(ctx, f.wink, W - pad * 2);
-    winkLines.forEach((l) => {
-      y += story ? 70 : 54;
+    ctx.font = `italic 400 ${story ? 46 : 34}px ${FONT}`;
+    wrap(ctx, f.line, W - pad * 2).forEach((l) => {
+      y += story ? 70 : 50;
       ctx.fillText(l, W / 2, y);
     });
 
     // Footer
-    const fy = H - (story ? 110 : 60);
+    const fy = H2 - (story ? 110 : 56);
     ctx.globalAlpha = 0.85;
     ctx.font = `500 ${story ? 34 : 28}px ${FONT}`;
     if (story) ctx.fillText(heroLine, W / 2, fy - 90);
@@ -236,7 +336,7 @@
 
   function shareText() {
     const f = flavours[state.result];
-    return `I'm ${f.name}. ${f.wink} What's your hop-nality? ${location.origin}${location.pathname} ${handle} ${hashtags}`;
+    return `I'm ${f.name}, ${f.archetype}. ${f.line} What the AF are you? ${location.origin}${location.pathname} ${handle} ${hashtags}`;
   }
 
   function download(blob, name) {
@@ -259,6 +359,7 @@
   }
 
   async function share() {
+    track("event", { event: "share" });
     const name = `hopnosis-${state.result}-af.png`;
     const blob = await drawCard("story");
     const file = new File([blob], name, { type: "image/png" });
@@ -280,32 +381,15 @@
   }
 
   async function saveSquare() {
+    track("event", { event: "square" });
     const blob = await drawCard("square");
     download(blob, `hopnosis-${state.result}-af-square.png`);
     toast("Square image saved.");
   }
 
-  // ---------- Wiring ----------
-  document.addEventListener("click", (e) => {
-    const action = e.target.closest("[data-action]")?.dataset.action;
-    if (!action) return;
-    if (action === "start") renderQuestion();
-    if (action === "back" && state.showdown) {
-      state.showdown = null;
-      renderQuestion();
-    } else if (action === "back" && state.step > 0) {
-      state.step--;
-      renderQuestion();
-    }
-    if (action === "restart") restart();
-    if (action === "share") share();
-    if (action === "save-square") saveSquare();
-  });
-
   // ---------- Email sign-up (pattern from Pulse's contact form) ----------
   const join = $(".join");
   let joinShownAt = 0; // seconds; the server ignores sign-ups sent faster than a person could
-  const src = (new URLSearchParams(location.search).get("src") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
 
   function joinStatus(msg, isError = false) {
     const el = $(".join__status", join);
@@ -354,6 +438,7 @@
       if (!res.ok || !body.success) throw new Error(body.message || "");
       join.classList.add("is-done");
       joinStatus("You're in. Welcome to the Hopnotised.");
+      track("event", { event: "optin" });
     } catch (err) {
       joinStatus(err.message || "That didn't go through. Try again in a moment.", true);
     } finally {
@@ -361,16 +446,42 @@
     }
   });
 
+  // ---------- Wiring ----------
+  $(".lede").textContent = H.welcome.body;
+  $(".welcome__title").textContent = H.welcome.title;
+  buildChips();
+
+  document.addEventListener("click", (e) => {
+    const tracked = e.target.closest("[data-track]");
+    if (tracked) track("event", { event: tracked.dataset.track });
+    const action = e.target.closest("[data-action]")?.dataset.action;
+    if (!action) return;
+    if (action === "start") start();
+    if (action === "back" && state.showdown) {
+      state.showdown = null;
+      renderQuestion();
+    } else if (action === "back" && state.step > 0) {
+      state.step--;
+      renderQuestion();
+    }
+    if (action === "restart") start();
+    if (action === "share") share();
+    if (action === "save-square") saveSquare();
+    if (action === "skip-insight") {
+      track("insight", { skipped: true });
+      insightDone("All skipped. Fair enough.");
+    }
+  });
+
   // Warm the can images so the result card is instant.
   Object.values(flavours).forEach((f) => loadImage(f.image));
 
-  // Test hook: ?result=lime jumps straight to a result screen.
+  // Test hook: ?result=lime jumps straight to a result screen (not tracked).
   const forced = new URLSearchParams(location.search).get("result");
   if (forced && flavours[forced]) {
     state.result = forced;
     renderResult();
     document.body.dataset.flavour = forced;
-    resetJoin();
     show("result");
   }
 })();

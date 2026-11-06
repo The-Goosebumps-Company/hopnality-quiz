@@ -1,132 +1,157 @@
-// Quiz content. Source of truth for copy: context/hopnality-quiz-copy.md (v0.1, not signed off).
-// Change copy there first, then mirror it here.
+// Quiz content. Source of truth: the client brief "WHAT THE AF ARE YOU?"
+// (context/creative-brief-nov-2026.md). Questions, archetypes, result lines and the opening are
+// the brief's own copy. Anything marked DRAFT is ours and needs sign-off (see the copy doc).
 
 const SHOP = "https://hopnosis.co.za/products/";
 
 window.HOPNALITY = {
+  welcome: {
+    title: "What the AF are you?",
+    body: "Three flavours. Three personalities. One questionable sense of self-awareness. Six questions. No wrong answers. Some mildly concerning revelations.",
+  },
+
   flavours: {
     classic: {
       name: "Classic AF",
-      title: "the original",
-      words: "Original. Funky. Unbothered.",
-      wink: "Never followed a trend. Started a few.",
+      archetype: "The Smooth Operator",
+      line: "Not everyone's cup of tea. Luckily, you're not tea.",
+      // DRAFT: the brief asks for a witty 2–3 sentence description per result.
       about:
-        "You were into it before it was a thing, and you're not going to make a big deal about it. Pure hops, no fruit, no filter. You don't need extras to be interesting. You are the extra.",
+        "You keep it cool when everyone else loses the plot. Good taste, zero need to announce it. Pure hops, no fruit, no fuss, which suits you fine.",
       image: "assets/can-classic.jpg",
       shop: SHOP + "classic-af-6-pack",
       theme: { bg: "#0d0d0d", ink: "#f4efe4", accent: "#cc8a00" },
     },
     mango: {
       name: "Mango AF",
-      title: "the chilled one",
-      words: "Sunny. Smooth. Unhurried.",
-      wink: "Five minutes away. Since 2019.",
+      archetype: "The Main Character",
+      line: "You don't bring the vibe. You are the vibe.",
       about:
-        "Fruity, chilled and impossible to stress out. You bring the good mood, the cooler box and zero urgency. Plans are more of a suggestion. Somehow everything still works out.",
+        "Magnetic, social and always up for it. A quick drink with you turns into an entire occasion, and nobody's complaining. Ordinary plans don't stand a chance.",
       image: "assets/can-mango.jpg",
       shop: SHOP + "mango-af-6-pack",
       theme: { bg: "#ffb33f", ink: "#141414", accent: "#141414" },
     },
     lime: {
       name: "Lime AF",
-      title: "the responsible one (allegedly)",
-      words: "Bright. Zesty. Sharp.",
-      wink: "The responsible one. Allegedly.",
+      archetype: "The Wild Card",
+      line: "Fresh attitude. Questionable intentions.",
       about:
-        "You booked the table, made the group chat and remembered the ice. Sharp wit, sharper plans. Everyone thinks you've got it together. You let them.",
+        "Sharp, quick-witted and allergic to the expected. You're the reason the group chat has a separate group chat. Long story. Worth it.",
       image: "assets/can-lime.jpg",
       shop: SHOP + "lime-af-6-pack",
       theme: { bg: "#97d700", ink: "#141414", accent: "#141414" },
     },
   },
 
-  // Each answer scores one point for its flavour. Answers are shuffled on screen.
+  // The brief's six questions. A = Classic, B = Mango, C = Lime; answers are shuffled on screen.
+  // Weight: the brief says personality-led answers count more than occasion/channel answers,
+  // so Q4 (sipping situation) and Q6 (where to bump into us) count 1, the rest count 2.
+  // Total is 10 points, so a three-way tie can't happen; two-way ties go to a showdown.
   questions: [
     {
-      q: "It's Friday, 5pm. You're…",
+      q: "Friday. Your personality has officially clocked out. Where are we finding you?",
+      weight: 2,
       a: [
-        ["classic", "Already at the spot everyone discovers next year."],
-        ["mango", "Horizontal. Somewhere with a view."],
-        ["lime", "Sending the group chat a plan. With times."],
+        ["classic", "At a braai, holding the tongs. Nobody asked me to take charge."],
+        ["mango", "Poolside, music on, surrounded by my favourite bad influences."],
+        ["lime", "Somewhere I wasn't planning to go. Long story."],
       ],
     },
     {
-      q: "In the group chat, you're…",
+      q: "Open your fridge. What are we dealing with?",
+      weight: 2,
       a: [
-        ["classic", "The one with the stories nobody believes."],
-        ["mango", "“Five minutes away.”"],
-        ["lime", "The one who actually booked the table."],
+        ["classic", "Everything in its place. Even the chaos is organised."],
+        ["mango", "Leftovers, three sauces and enough drinks for unexpected guests."],
+        ["lime", "Half a lime, something mysterious and absolutely no plan for dinner."],
       ],
     },
     {
-      q: "At the braai, you're…",
+      q: "Your friends have described you as…",
+      weight: 2,
       a: [
-        ["classic", "On the tongs. Nobody else touches the tongs."],
-        ["mango", "In the camping chair. Supervising."],
-        ["lime", "The one who remembered the firelighters, the ice and the salad."],
+        ["classic", "The one who keeps it cool when everyone else loses the plot."],
+        ["mango", "The one who turns a quick drink into an entire occasion."],
+        ["lime", "The reason the group chat has a separate group chat."],
       ],
     },
     {
-      q: "Your camera roll is mostly…",
+      q: "Pick your ideal sipping situation.",
+      weight: 1,
       a: [
-        ["classic", "Gigs, sunsets and one blurry photo you swear was iconic."],
-        ["mango", "The beach. The same beach. Every angle."],
-        ["lime", "Screenshots of things you'll definitely get to."],
+        ["classic", "Sunset, good company, something cold. Nothing complicated."],
+        ["mango", "Pool party, festival, rooftop or wherever the gees is."],
+        ["lime", "Post-workout, spontaneous road trip or an unexpected adventure."],
       ],
     },
     {
-      q: "The 3am text. You…",
+      q: "Someone offers you a drink you've never tried. Your reaction?",
+      weight: 2,
       a: [
-        ["classic", "Send it. Own it."],
-        ["mango", "Were asleep by ten. Unbothered."],
-        ["lime", "Type it, delete it, feel quietly superior."],
+        ["classic", "What's in it? I have questions. And standards."],
+        ["mango", "I'm in. Give me the coldest one."],
+        ["lime", "Interesting. What else have you got?"],
       ],
     },
     {
-      q: "Dezemba plans?",
+      q: "Where would you most want to bump into hopnøsis?",
+      weight: 1,
       a: [
-        ["classic", "A road trip, a festival and a story for the ages."],
-        ["mango", "Coast. Cooler box. Do not disturb."],
-        ["lime", "Booked in July. Packing list laminated."],
-      ],
-    },
-    {
-      q: "Pick a soundtrack.",
-      a: [
-        ["classic", "Something with bass you feel in your chest."],
-        ["mango", "Amapiano at sunset."],
-        ["lime", "A podcast on 1.5x speed."],
+        ["classic", "My favourite restaurant, bar or a proper braai."],
+        ["mango", "At a festival, poolside or a weekend market."],
+        ["lime", "Gym, padel court or my local convenience store."],
       ],
     },
   ],
 
-  // Tie-break. 7 points over 3 flavours means the only possible tie is 3-3-1.
+  // Tie-break (the brief: "a predetermined tie-break question or rule"). DRAFT copy.
   // Keyed by the two tied flavours, sorted alphabetically. Only the tied two appear.
   showdowns: {
     "lime-mango": {
-      q: "Last one. Pick a mood.",
+      q: "Too close to call. Pick a plan.",
       a: [
-        ["lime", "Running the plan."],
-        ["mango", "Running late."],
+        ["mango", "Make it an occasion."],
+        ["lime", "Make it up as we go."],
       ],
     },
     "classic-lime": {
-      q: "Last one. Pick a role.",
+      q: "Too close to call. Pick a move.",
       a: [
-        ["lime", "The organiser."],
-        ["classic", "The legend."],
+        ["classic", "Stay cool."],
+        ["lime", "Go rogue."],
       ],
     },
     "classic-mango": {
-      q: "Last one. Pick a pace.",
+      q: "Too close to call. Pick an entrance.",
       a: [
-        ["mango", "Slow and sunny."],
-        ["classic", "Loud and late."],
+        ["classic", "Quietly. They'll notice."],
+        ["mango", "Loudly. They'll remember."],
       ],
     },
   },
 
-  heroLine: "A drink that behaves. Even if you don't.", // if/when wording still open
+  // After the result (the brief's "optional insight capture" and commercial CTA).
+  insight: {
+    title: "Before you disappear into the wild…",
+    ageBands: ["Under 18", "18–24", "25–34", "35–44", "45–54", "55+"],
+    cities: ["Johannesburg", "Pretoria", "Cape Town", "Durban", "Gqeberha", "Bloemfontein", "Somewhere else"],
+    channels: [
+      ["supermarket", "Supermarket"],
+      ["gym", "Gym or padel"],
+      ["bars", "Restaurants and bars"],
+      ["convenience", "Petrol or convenience store"],
+      ["events", "Festivals and events"],
+      ["online", "Online"],
+    ],
+  },
+  mixed: {
+    line: "Think we got you wrong? Try all three and argue with the algorithm.",
+    label: "Shop the Mixed AF 4-pack",
+    url: "https://hopnosis.co.za/collections/all", // TODO: point at the Mixed AF 4-pack once its product URL is confirmed
+  },
+
+  heroLine: "A drink that behaves. Even if you don't.",
   signOff: "SIP HAPPENS™",
   handle: "@hopnosis_official", // Instagram, from the 5 Nov creator DMs in the Blueprint
   hashtags: "#hopnosis #SipHappens",

@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>What's your hop-nality? | hopnøsis</title>
-  <meta name="description" content="Seven questions. One flavour. Find your hopnøsis hop-nality.">
+  <title>What the AF are you? | hopnøsis</title>
+  <meta name="description" content="Three flavours. Three personalities. Six questions. Find out what the AF you are.">
   <meta name="theme-color" content="#0d0d0d">
-  <meta property="og:title" content="What's your hop-nality?">
-  <meta property="og:description" content="Seven questions. No wrong answers. A few questionable ones.">
+  <meta property="og:title" content="What the AF are you?">
+  <meta property="og:description" content="Six questions. No wrong answers. Some mildly concerning revelations.">
   <meta property="og:image" content="assets/can-classic.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,8 +21,8 @@
     <section class="screen screen--welcome is-active" data-screen="welcome">
       <p class="wordmark">hopnøsis</p>
       <div class="welcome__body">
-        <h1>What's your hop&#8209;nality?</h1>
-        <p class="lede">Seven questions. No wrong answers. A few questionable ones.</p>
+        <h1 class="welcome__title">What the AF are you?</h1>
+        <p class="lede"></p>
         <button class="btn btn--primary" data-action="start">Find out</button>
       </div>
       <p class="fineprint">Takes about a minute. Ø ALC | Ø CAL | Ø SUG</p>
@@ -32,12 +32,12 @@
     <section class="screen screen--question" data-screen="question">
       <header class="qhead">
         <button class="btn--back" data-action="back" aria-label="Previous question">←</button>
-        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="1">
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="6" aria-valuenow="1">
           <div class="progress__bar"></div>
         </div>
         <span class="progress__label"></span>
       </header>
-      <h2 class="qtext"></h2>
+      <h2 class="qtext" tabindex="-1"></h2>
       <div class="answers"></div>
     </section>
 
@@ -49,7 +49,7 @@
 
     <!-- Result -->
     <section class="screen screen--result" data-screen="result">
-      <p class="result__eyebrow">Your hop-nality is</p>
+      <p class="result__eyebrow">You're</p>
       <article class="card">
         <div class="card__photo"><img alt=""></div>
         <h2 class="card__name"></h2>
@@ -58,10 +58,59 @@
       </article>
       <p class="result__about"></p>
       <div class="result__actions">
-        <a class="btn btn--primary" data-role="shop" target="_blank" rel="noopener"></a>
-        <button class="btn btn--ghost" data-action="share">Share your hop-nality</button>
+        <a class="btn btn--primary" data-role="shop" data-track="shop" target="_blank" rel="noopener"></a>
+        <button class="btn btn--ghost" data-action="share">Share your result</button>
         <button class="btn btn--link" data-action="save-square">Save square image</button>
       </div>
+
+      <!-- Did we nail it? Actual favourite, recorded separately from the quiz result. -->
+      <section class="panel nail" aria-labelledby="nail-title">
+        <h3 class="panel__title" id="nail-title">Did we nail it?</h3>
+        <p class="panel__body">Which one's actually your favourite?</p>
+        <div class="chips" role="group" aria-labelledby="nail-title">
+          <button class="chip" data-nail="classic">Classic AF</button>
+          <button class="chip" data-nail="mango">Mango AF</button>
+          <button class="chip" data-nail="lime">Lime AF</button>
+          <button class="chip" data-nail="untried">Haven't tried them yet</button>
+        </div>
+        <p class="panel__done" hidden>Noted. The algorithm is taking it personally.</p>
+      </section>
+
+      <!-- Commercial CTA -->
+      <section class="panel mixed">
+        <p class="mixed__line"></p>
+        <a class="btn btn--ghost" data-role="mixed" data-track="mix" target="_blank" rel="noopener"></a>
+      </section>
+
+      <!-- Optional insight capture: research only, never used for the flavour result. -->
+      <form class="panel insight" novalidate>
+        <h3 class="panel__title insight__title"></h3>
+        <p class="panel__body">Three quick ones to help us get hopnøsis where you are. All optional.</p>
+        <fieldset class="insight__group">
+          <legend>Age</legend>
+          <div class="chips chips--radio" data-field="age_band"></div>
+        </fieldset>
+        <fieldset class="insight__group">
+          <legend>City</legend>
+          <div class="chips chips--radio" data-field="city"></div>
+          <label class="insight__suburb">
+            <span>Suburb or postcode (optional)</span>
+            <input name="suburb" type="text" maxlength="60" autocomplete="address-level3">
+          </label>
+        </fieldset>
+        <fieldset class="insight__group">
+          <legend>Where would you buy or drink hopnøsis? Pick any.</legend>
+          <div class="chips chips--check" data-field="channels"></div>
+        </fieldset>
+        <div class="insight__actions">
+          <button class="btn btn--primary" type="submit">Send</button>
+          <button class="btn btn--link" type="button" data-action="skip-insight">Skip</button>
+        </div>
+        <p class="panel__fine">Anonymous: no name, no email, not linked to the sign-up below. Used only to decide where hopnøsis goes next. <a href="https://hopnosis.co.za/policies/privacy-policy" target="_blank" rel="noopener">Privacy policy</a></p>
+        <p class="panel__done" hidden>Thanks. That's genuinely useful.</p>
+      </form>
+
+      <!-- Marketing opt-in: separate from the research questions, never pre-ticked. -->
       <form class="join" novalidate>
         <h3 class="join__title">Join the Hopnotised.</h3>
         <p class="join__body">First dibs on drops, events and the occasional surprise.</p>
@@ -82,6 +131,7 @@
         <p class="join__status" role="status" aria-live="polite"></p>
         <p class="join__fine">No spam. No nonsense. No compromise. <a href="https://hopnosis.co.za/policies/privacy-policy" target="_blank" rel="noopener">Privacy policy</a></p>
       </form>
+
       <p class="result__again">Not you today? Every version of you counts. <button class="btn--inline" data-action="restart">Take it again</button></p>
       <footer class="result__foot">
         <p class="hero-line"></p>
