@@ -3,6 +3,7 @@
 // the brief's own copy. Anything marked DRAFT is ours and needs sign-off (see the copy doc).
 
 const SHOP = "https://hopnosis.co.za/products/";
+// Result "Shop" buttons go to that flavour's 4-pack, The Quartet (R119.99): the brief's "Try your type".
 
 window.HOPNALITY = {
   welcome: {
@@ -19,7 +20,7 @@ window.HOPNALITY = {
       about:
         "You keep it cool when everyone else loses the plot. Good taste, zero need to announce it. Pure hops, no fruit, no fuss, which suits you fine.",
       image: "assets/can-classic.jpg",
-      shop: SHOP + "classic-af-6-pack",
+      shop: SHOP + "classic-af-4-pack",
       theme: { bg: "#0d0d0d", ink: "#f4efe4", accent: "#cc8a00" },
     },
     mango: {
@@ -29,7 +30,7 @@ window.HOPNALITY = {
       about:
         "Magnetic, social and always up for it. A quick drink with you turns into an entire occasion, and nobody's complaining. Ordinary plans don't stand a chance.",
       image: "assets/can-mango.jpg",
-      shop: SHOP + "mango-af-6-pack",
+      shop: SHOP + "mango-af-4-pack",
       theme: { bg: "#ffb33f", ink: "#141414", accent: "#141414" },
     },
     lime: {
@@ -39,7 +40,7 @@ window.HOPNALITY = {
       about:
         "Sharp, quick-witted and allergic to the expected. You're the reason the group chat has a separate group chat. Long story. Worth it.",
       image: "assets/can-lime.jpg",
-      shop: SHOP + "lime-af-6-pack",
+      shop: SHOP + "ime-af-the-quartet", // sic: the shop's Lime Quartet URL is missing its "l"
       theme: { bg: "#97d700", ink: "#141414", accent: "#141414" },
     },
   },
@@ -149,7 +150,7 @@ window.HOPNALITY = {
     line: "Think we got you wrong? Try all three and argue with the algorithm.",
     // The brief names a "Mixed AF 4-pack", but the shop has no such product (checked 6 Nov).
     // The nearest is The Middle Ground (6 Can Mixed Pack), R179.99. Swap when a mixed 4-pack exists.
-    label: "Try all three: the mixed 6-pack",
+    label: "Shop the mixed 6-pack",
     url: SHOP + "the-middle-ground-6-can-mixed-pack",
   },
 

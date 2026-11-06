@@ -24,7 +24,7 @@ Then open http://localhost:8765. To jump straight to a result, add `?result=clas
 ## How it works
 - **Questions:** the brief's six questions, three answers each, shown in random order.
 - **Scoring:** weighted, as the brief asks. Personality questions Q1, Q2, Q3 and Q5 count 2 points; occasion and channel questions Q4 and Q6 count 1 (`weight` in `data.js`). That's 10 points in all, so a three-way tie can't happen. When two flavours tie, a showdown question with just those two decides it (`showdowns`).
-- **Result screen:** the archetype card, a 2–3 sentence description, **Shop** (that flavour's 6-pack), Share and Save square.
+- **Result screen:** the archetype card, a 2–3 sentence description, **Try your type** (that flavour's 4-pack, The Quartet), Share and Save square.
 - **Under the result:**
   - **Did we nail it?** asks for their actual favourite, which is stored separately from the quiz result.
   - **Try all three** links to the mixed 6-pack.

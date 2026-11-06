@@ -129,7 +129,7 @@
     $(".result__about", screen).textContent = f.about;
     const shop = $('[data-role="shop"]', screen);
     shop.href = f.shop;
-    shop.textContent = `Shop ${f.name}`;
+    shop.textContent = `Try your type: ${f.name} 4-pack`;
     $(".hero-line", screen).textContent = heroLine;
     resetPanels();
   }
