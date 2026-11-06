@@ -61,9 +61,9 @@ git archive "$COMMIT" deploy/server-setup.sh | tar -x -C "$STAGE"
   rsync -az -e "ssh -o BatchMode=yes" "$STAGE/deploy/server-setup.sh" "$HOST:/tmp/hopnosis-server-setup.sh"
   "${SSH[@]}" "sudo bash /tmp/hopnosis-server-setup.sh && rm -f /tmp/hopnosis-server-setup.sh"
 }
-rsync -az --chmod=D755,F644 --link-dest="$BASE/current/" -e "ssh -o BatchMode=yes" \
+rsync -az --link-dest="$BASE/current/" -e "ssh -o BatchMode=yes" \
   "$STAGE/release/" "$HOST:$BASE/releases/$REL/"
-"${SSH[@]}" "echo $COMMIT > $BASE/releases/$REL.commit"
+"${SSH[@]}" "chmod -R u=rwX,go=rX $BASE/releases/$REL && echo $COMMIT > $BASE/releases/$REL.commit"
 
 # 2. Re-apply server config (idempotent; also issues the certificate once DNS points here).
 rsync -az -e "ssh -o BatchMode=yes" "$STAGE/deploy/server-setup.sh" "$HOST:/tmp/hopnosis-server-setup.sh"
