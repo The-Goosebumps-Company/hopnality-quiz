@@ -20,7 +20,8 @@ SSH=(ssh -o BatchMode=yes "$HOST")
 
 smoke() {  # Ask the box's own Apache for the live site, by name.
   "${SSH[@]}" "set -e
-    if [ -f /etc/letsencrypt/live/$DOMAIN/fullchain.pem ]; then
+    # /etc/letsencrypt/live is root-only, so check with sudo (plain -f is always false as ubuntu).
+    if sudo test -f /etc/letsencrypt/live/$DOMAIN/fullchain.pem; then
       C='curl -fsS --max-time 10 --resolve $DOMAIN:443:127.0.0.1'; U=https://$DOMAIN
     else
       C='curl -fsS --max-time 10 --resolve $DOMAIN:80:127.0.0.1'; U=http://$DOMAIN
