@@ -1,7 +1,9 @@
 # hopnøsis hop-nality quiz
 
-A static site with plain HTML, CSS and JavaScript. There's no build step, no backend and no database.
-Brief: `../context/hopnality-quiz.md`. Copy source: `../context/hopnality-quiz-copy.md` (v0.1, not signed off).
+**"What the AF are you?"**: plain HTML, CSS and JavaScript with no build step, plus a small PHP and MariaDB API for sign-ups and anonymous stats.
+- **Client brief (source of truth):** `../context/creative-brief-nov-2026.md`
+- **Copy:** `../context/hopnality-quiz-copy.md` (v0.2; our drafted lines are marked for sign-off)
+- **Background:** `../context/hopnality-quiz.md`
 
 ## Files
 - `index.html`: all four screens (welcome, question, loading, result)
@@ -9,6 +11,9 @@ Brief: `../context/hopnality-quiz.md`. Copy source: `../context/hopnality-quiz-c
 - `app.js`: quiz flow, scoring, and share-card image generation (canvas)
 - `styles.css`: themes per flavour (Classic black/gold, Mango orange, Lime green)
 - `assets/can-*.jpg`: single-can photos pulled from the hopnosis.co.za Shopify store
+- `api/`: `subscribe.php` (email sign-up), `track.php` (anonymous per-run stats), `lib.php` (shared helpers), `schema.sql`
+- `deploy/`: `deploy.sh`, `server-setup.sh`, `stats.sh`, `export-subscribers.sh`
+- `print/`: the A4 QR poster (`poster.html`, run `print/render.sh` to rebuild `print/out/*.pdf|png`) and QR SVGs for the poster (`?src=poster`) and the board (`?src=board`). These are not published with the site.
 
 ## Run locally
 ```bash
@@ -17,9 +22,15 @@ python3 -m http.server 8765 --directory quiz
 Then open http://localhost:8765. To jump straight to a result, add `?result=classic`, `?result=mango` or `?result=lime`.
 
 ## How it works
-- There are seven questions with three answers each, shown in random order. Each answer adds a point to one flavour.
-- The highest score wins. The only possible tie is 3-3-1. When that happens, a "Tiebreak" question with only the two tied flavours decides it (`showdowns` in `data.js`).
-- **Shop** links to that flavour's 6-pack page (`hopnosis.co.za/products/<flavour>-af-6-pack`).
+- **Questions:** the brief's six questions, three answers each, shown in random order.
+- **Scoring:** weighted, as the brief asks. Personality questions Q1, Q2, Q3 and Q5 count 2 points; occasion and channel questions Q4 and Q6 count 1 (`weight` in `data.js`). That's 10 points in all, so a three-way tie can't happen. When two flavours tie, a showdown question with just those two decides it (`showdowns`).
+- **Result screen:** the archetype card, a 2–3 sentence description, **Shop** (that flavour's 6-pack), Share and Save square.
+- **Under the result:**
+  - **Did we nail it?** asks for their actual favourite, which is stored separately from the quiz result.
+  - **Try all three** links to the mixed 6-pack.
+  - **Optional research questions:** age band, city, suburb and where they'd buy. They're anonymous and skippable.
+  - **The email opt-in**, kept separate.
+- **Stats:** every run is one anonymous row in `results` (`api/track.php`), with no IP, name or email. It records start and finish, the flavour, the picks, the tiebreak, "Did we nail it?", the research answers, and share, shop, mixed-pack and opt-in clicks. Where there's no backend (the GitHub Pages preview), tracking does nothing.
 - **Share** builds a 1080×1920 story image. On phones it opens the native share sheet. On desktop it downloads the image and copies the caption.
 - **Save square image** builds a 1080×1080 image.
 
@@ -35,6 +46,13 @@ On the result screen, people can leave an email address and tick a consent box. 
 - **Export:** `deploy/export-subscribers.sh > ~/Downloads/hopnosis-subscribers.csv`. Use `--count` to get just the numbers. The file holds personal data, so don't commit it.
 - **Not built yet:** unsubscribing is handled by whatever tool sends the emails later. Import from the CSV, and remove anyone who unsubscribes from the database too.
 - **Preview copy:** the sign-up form only works on the server. On the GitHub Pages copy it shows "That didn't go through".
+
+## Numbers
+```bash
+deploy/stats.sh               # completion, flavour split, nail-it hit rate, shares/clicks, opt-in rate, age, city, channels
+deploy/stats.sh 2026-11-07    # one day (UTC)
+deploy/stats.sh --csv > runs.csv
+```
 
 ## Deploy
 **Production: https://quiz.hopnosis.co.za** runs on the PowerHER Xneelo VM (`154.65.107.108`), set up the same way as Pulse's staging and production:

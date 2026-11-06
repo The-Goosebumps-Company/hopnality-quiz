@@ -17,6 +17,7 @@ body[data-flavour="mango"]   { --bg: #ffb33f; --ink: #141414; --muted: rgba(20,2
 body[data-flavour="lime"]    { --bg: #97d700; --ink: #141414; --muted: rgba(20,20,20,.72); --line: rgba(20,20,20,.25); --accent: #141414; --accent-ink: #97d700; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
 html, body { height: 100%; }
 body {
   background: var(--bg);

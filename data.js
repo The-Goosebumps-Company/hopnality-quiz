@@ -147,8 +147,10 @@ window.HOPNALITY = {
   },
   mixed: {
     line: "Think we got you wrong? Try all three and argue with the algorithm.",
-    label: "Shop the Mixed AF 4-pack",
-    url: "https://hopnosis.co.za/collections/all", // TODO: point at the Mixed AF 4-pack once its product URL is confirmed
+    // The brief names a "Mixed AF 4-pack", but the shop has no such product (checked 6 Nov).
+    // The nearest is The Middle Ground (6 Can Mixed Pack), R179.99. Swap when a mixed 4-pack exists.
+    label: "Try all three: the mixed 6-pack",
+    url: SHOP + "the-middle-ground-6-can-mixed-pack",
   },
 
   heroLine: "A drink that behaves. Even if you don't.",
