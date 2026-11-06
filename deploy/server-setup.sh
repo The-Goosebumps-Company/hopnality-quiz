@@ -74,7 +74,7 @@ php_admin_flag[log_errors] = on
 EOF
 touch /var/log/apache2/hopnosis-quiz-php.log && chown "$APPUSER":adm /var/log/apache2/hopnosis-quiz-php.log && chmod 640 /var/log/apache2/hopnosis-quiz-php.log
 
-# ---- Apache --------------------------------------------------------------------------
+# ---- Apache (sites named after the domain, so PowerHER stays the default vhost) --------------------------------------------------------------------------
 cat > /etc/apache2/hopnosis-quiz-app.conf <<EOF
     ServerName $DOMAIN
     DocumentRoot $BASE/current
@@ -123,14 +123,14 @@ EOF
 
 CERT=/etc/letsencrypt/live/$DOMAIN
 write_http_only() {
-  cat > /etc/apache2/sites-available/hopnosis-quiz.conf <<EOF
+  cat > /etc/apache2/sites-available/$DOMAIN.conf <<EOF
 <VirtualHost *:80>
     Include /etc/apache2/hopnosis-quiz-app.conf
 </VirtualHost>
 EOF
 }
 write_tls() {
-  cat > /etc/apache2/sites-available/hopnosis-quiz.conf <<EOF
+  cat > /etc/apache2/sites-available/$DOMAIN.conf <<EOF
 <VirtualHost *:80>
     ServerName $DOMAIN
     DocumentRoot $BASE/current
@@ -142,7 +142,7 @@ write_tls() {
     RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
 EOF
-  cat > /etc/apache2/sites-available/hopnosis-quiz-le-ssl.conf <<EOF
+  cat > /etc/apache2/sites-available/$DOMAIN-le-ssl.conf <<EOF
 <IfModule mod_ssl.c>
 <VirtualHost *:443>
     Protocols h2 http/1.1
@@ -154,11 +154,14 @@ EOF
 </VirtualHost>
 </IfModule>
 EOF
-  a2ensite -q hopnosis-quiz-le-ssl >/dev/null
+  a2ensite -q $DOMAIN-le-ssl >/dev/null
 }
 
 if [ -f "$CERT/fullchain.pem" ]; then write_tls; else write_http_only; fi
-a2ensite -q hopnosis-quiz >/dev/null
+# Site files are named after the domain (as on Pulse). Apache's default vhost is the first
+# file alphabetically, and "quiz…" sorts after "powerher…", so PowerHER stays the default.
+for old in hopnosis-quiz hopnosis-quiz-le-ssl; do a2dissite -q $old >/dev/null 2>&1 || true; rm -f /etc/apache2/sites-available/$old.conf; done
+a2ensite -q $DOMAIN >/dev/null
 
 apache2ctl configtest
 systemctl reload php$PHPV-fpm
