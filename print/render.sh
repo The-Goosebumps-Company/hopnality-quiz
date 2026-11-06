@@ -10,4 +10,7 @@ P="file://$PWD/poster.html"
 # A4 at 150 dpi = 1240 x 1754
 "$CHROME" --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=8000 --force-device-scale-factor=1.5 \
   --window-size=794,1123 --screenshot="$PWD/out/hopnosis-quiz-poster-a4.png" "$P" 2>/dev/null
+# Taplink hero (quiz-only page), 1080 x 1200
+"$CHROME" --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=8000 \
+  --window-size=1080,1200 --screenshot="$PWD/out/taplink-hero.png" "file://$PWD/taplink-hero.html" 2>/dev/null
 ls -lh out
