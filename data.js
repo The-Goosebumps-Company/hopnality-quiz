@@ -128,5 +128,6 @@ window.HOPNALITY = {
 
   heroLine: "A drink that behaves. Even if you don't.", // if/when wording still open
   signOff: "SIP HAPPENS™",
+  handle: "@hopnosis_official", // Instagram, from the 5 Nov creator DMs in the Blueprint
   hashtags: "#hopnosis #SipHappens",
 };

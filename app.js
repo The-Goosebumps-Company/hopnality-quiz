@@ -1,5 +1,5 @@
 (() => {
-  const { flavours, questions, showdowns, heroLine, signOff, hashtags } = window.HOPNALITY;
+  const { flavours, questions, showdowns, heroLine, signOff, handle, hashtags } = window.HOPNALITY;
   const $ = (sel, root = document) => root.querySelector(sel);
 
   // showdown: key into `showdowns` while the tie-break question is on screen, else null.
@@ -236,7 +236,7 @@
 
   function shareText() {
     const f = flavours[state.result];
-    return `I'm ${f.name}. ${f.wink} What's your hop-nality? ${location.origin}${location.pathname} ${hashtags}`;
+    return `I'm ${f.name}. ${f.wink} What's your hop-nality? ${location.origin}${location.pathname} ${handle} ${hashtags}`;
   }
 
   function download(blob, name) {
