@@ -87,6 +87,7 @@
     show("loading");
     setTimeout(() => {
       document.body.dataset.flavour = state.result;
+      resetJoin();
       show("result");
     }, 1500);
   }
@@ -301,6 +302,65 @@
     if (action === "save-square") saveSquare();
   });
 
+  // ---------- Email sign-up (pattern from Pulse's contact form) ----------
+  const join = $(".join");
+  let joinShownAt = 0; // seconds; the server ignores sign-ups sent faster than a person could
+  const src = (new URLSearchParams(location.search).get("src") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
+
+  function joinStatus(msg, isError = false) {
+    const el = $(".join__status", join);
+    el.textContent = msg;
+    el.classList.toggle("is-error", isError);
+  }
+
+  function resetJoin() {
+    join.reset();
+    join.classList.remove("is-done");
+    $('input[name="email"]', join).removeAttribute("aria-invalid");
+    joinStatus("");
+    joinShownAt = Math.floor(Date.now() / 1000);
+  }
+
+  join.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const emailEl = $('input[name="email"]', join);
+    const email = emailEl.value.trim();
+    const consent = $('input[name="consent"]', join).checked;
+    if (!emailEl.checkValidity() || !email) {
+      emailEl.setAttribute("aria-invalid", "true");
+      emailEl.focus();
+      return joinStatus("That email doesn't look right.", true);
+    }
+    emailEl.removeAttribute("aria-invalid");
+    if (!consent) return joinStatus("Tick the box so we're allowed to email you.", true);
+
+    const btn = $(".join__submit", join);
+    btn.disabled = true;
+    joinStatus("Sending…");
+    try {
+      const res = await fetch("api/subscribe.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          consent: true,
+          flavour: state.result,
+          source: src,
+          started_at: joinShownAt,
+          website: $('input[name="website"]', join).value,
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || !body.success) throw new Error(body.message || "");
+      join.classList.add("is-done");
+      joinStatus("You're in. Welcome to the Hopnotised.");
+    } catch (err) {
+      joinStatus(err.message || "That didn't go through. Try again in a moment.", true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   // Warm the can images so the result card is instant.
   Object.values(flavours).forEach((f) => loadImage(f.image));
 
@@ -310,6 +370,7 @@
     state.result = forced;
     renderResult();
     document.body.dataset.flavour = forced;
+    resetJoin();
     show("result");
   }
 })();

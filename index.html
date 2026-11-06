@@ -62,6 +62,26 @@
         <button class="btn btn--ghost" data-action="share">Share your hop-nality</button>
         <button class="btn btn--link" data-action="save-square">Save square image</button>
       </div>
+      <form class="join" novalidate>
+        <h3 class="join__title">Join the Hopnotised.</h3>
+        <p class="join__body">First dibs on drops, events and the occasional surprise.</p>
+        <label class="join__label" for="join-email">Email</label>
+        <div class="join__row">
+          <input id="join-email" name="email" type="email" inputmode="email" autocomplete="email" maxlength="254" required placeholder="you@example.com">
+          <button class="btn btn--primary join__submit" type="submit">Get invited</button>
+        </div>
+        <label class="join__consent">
+          <input name="consent" type="checkbox">
+          <span>Yes, hopnøsis can email me. Unsubscribe anytime.</span>
+        </label>
+        <!-- Honeypot: hidden from people, irresistible to bots (same trap as Pulse's contact form). -->
+        <div class="join__trap" aria-hidden="true">
+          <label for="join-website">Website</label>
+          <input id="join-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <p class="join__status" role="status" aria-live="polite"></p>
+        <p class="join__fine">No spam. No nonsense. No compromise. <a href="https://hopnosis.co.za/policies/privacy-policy" target="_blank" rel="noopener">Privacy policy</a></p>
+      </form>
       <p class="result__again">Not you today? Every version of you counts. <button class="btn--inline" data-action="restart">Take it again</button></p>
       <footer class="result__foot">
         <p class="hero-line"></p>

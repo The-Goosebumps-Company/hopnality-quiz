@@ -121,6 +121,32 @@ body[data-flavour="classic"] :focus-visible, body:not([data-flavour]) :focus-vis
 .result__foot { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .hero-line { font-size: 14px; color: var(--muted); }
 
+/* Email sign-up */
+.join { display: flex; flex-direction: column; gap: 10px; padding: 22px 20px; border: 1.5px solid var(--line); border-radius: var(--radius); }
+.join__title { font-size: 26px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+.join__body { font-size: 16px; line-height: 1.45; color: var(--muted); margin-bottom: 4px; }
+.join__label { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.join__row { display: flex; flex-direction: column; gap: 10px; }
+.join input[type="email"] {
+  width: 100%; min-height: 54px; padding: 0 18px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: transparent; color: var(--ink);
+  font: inherit; font-size: 17px;
+}
+.join input[type="email"]::placeholder { color: var(--muted); }
+.join input[type="email"]:focus { outline: none; border-color: var(--accent); }
+.join input[aria-invalid="true"] { border-color: #e2412d; }
+.join__submit[disabled] { opacity: .6; cursor: wait; }
+.join__consent { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; line-height: 1.4; cursor: pointer; margin-top: 4px; }
+.join__consent input { width: 22px; height: 22px; flex: none; margin-top: 1px; accent-color: var(--accent); }
+.join__trap { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.join__status { font-size: 15px; font-weight: 500; min-height: 1.4em; }
+.join__status.is-error { color: #e2412d; }
+body[data-flavour="mango"] .join__status.is-error, body[data-flavour="lime"] .join__status.is-error { color: #8a1205; }
+.join__fine { font-size: 13px; color: var(--muted); }
+.join__fine a { color: inherit; text-underline-offset: 3px; }
+.join.is-done .join__row, .join.is-done .join__consent, .join.is-done .join__label, .join.is-done .join__body { display: none; }
+@media (min-width: 420px) { .join__row { flex-direction: row; } .join__submit { width: auto; flex: none; } }
+
 .toast {
   position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translate(-50%, 30px);
   background: #f4efe4; color: #0d0d0d; padding: 12px 18px; border-radius: 99px; font-weight: 500; font-size: 15px;

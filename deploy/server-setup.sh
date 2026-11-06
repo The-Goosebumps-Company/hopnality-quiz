@@ -51,7 +51,9 @@ EOF
 fi
 chown root:"$APPUSER" "$BASE/shared/config/settings.php"; chmod 640 "$BASE/shared/config/settings.php"
 # Schema lives in the release (api/schema.sql) once the intake form exists.
-[ -f "$BASE/current/api/schema.sql" ] && mariadb "$DB" < "$BASE/current/api/schema.sql"
+# Applied from the release about to go live (deploy.sh passes its path), before the flip.
+RELEASE=${1:-$BASE/current}
+if [ -f "$RELEASE/api/schema.sql" ]; then mariadb "$DB" < "$RELEASE/api/schema.sql"; fi
 
 # ---- PHP-FPM pool (own user; overrides PowerHER's global open_basedir) ---------------
 cat > /etc/php/$PHPV/fpm/pool.d/hopnosis-quiz.conf <<EOF

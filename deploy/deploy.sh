@@ -18,10 +18,17 @@ WEB_PATHS=(index.html styles.css data.js app.js assets api)
 
 SSH=(ssh -o BatchMode=yes "$HOST")
 
-smoke() {  # Ask the box's own Apache for the live page, by name, and check it's the quiz.
-  "${SSH[@]}" "if [ -f /etc/letsencrypt/live/$DOMAIN/fullchain.pem ]; then
-      curl -fsS --max-time 10 --resolve $DOMAIN:443:127.0.0.1 https://$DOMAIN/; else
-      curl -fsS --max-time 10 -H 'Host: $DOMAIN' http://127.0.0.1/; fi" | grep -q 'data-screen="welcome"'
+smoke() {  # Ask the box's own Apache for the live site, by name.
+  "${SSH[@]}" "set -e
+    if [ -f /etc/letsencrypt/live/$DOMAIN/fullchain.pem ]; then
+      C='curl -fsS --max-time 10 --resolve $DOMAIN:443:127.0.0.1'; U=https://$DOMAIN
+    else
+      C='curl -fsS --max-time 10 --resolve $DOMAIN:80:127.0.0.1'; U=http://$DOMAIN
+    fi
+    \$C \$U/ | grep -q 'data-screen=\"welcome\"'
+    # Sign-up endpoint: a honeypot hit reaches the DB (rate limit) but stores nothing.
+    if \$C -o /dev/null \$U/api/subscribe.php -H 'Content-Type: application/json' -H \"Origin: \$U\" \\
+         -d '{\"website\":\"smoke-test\"}' 2>/dev/null || [ ! -e $BASE/current/api ]; then :; else exit 1; fi"
 }
 
 case "${1:-}" in
@@ -65,9 +72,10 @@ rsync -az --link-dest="$BASE/current/" -e "ssh -o BatchMode=yes" \
   "$STAGE/release/" "$HOST:$BASE/releases/$REL/"
 "${SSH[@]}" "chmod -R u=rwX,go=rX $BASE/releases/$REL && echo $COMMIT > $BASE/releases/$REL.commit"
 
-# 2. Re-apply server config (idempotent; also issues the certificate once DNS points here).
+# 2. Re-apply server config and the new release's schema (idempotent; also issues the
+#    certificate once DNS points here).
 rsync -az -e "ssh -o BatchMode=yes" "$STAGE/deploy/server-setup.sh" "$HOST:/tmp/hopnosis-server-setup.sh"
-"${SSH[@]}" "sudo bash /tmp/hopnosis-server-setup.sh && rm -f /tmp/hopnosis-server-setup.sh"
+"${SSH[@]}" "sudo bash /tmp/hopnosis-server-setup.sh $BASE/releases/$REL && rm -f /tmp/hopnosis-server-setup.sh"
 
 # 3. Atomic flip, then smoke test; flip straight back if it fails.
 PREV=$("${SSH[@]}" "readlink -f $BASE/current")
