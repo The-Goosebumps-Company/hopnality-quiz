@@ -84,4 +84,4 @@ function source_param($value): ?string
     return is_string($value) && preg_match('/^[a-z0-9_-]{1,32}$/', $value) ? $value : null;
 }
 
-const FLAVOURS = ['classic', 'mango', 'lime'];
+const FLAVOURS = ['classic', 'mango', 'lime', 'unicorn'];

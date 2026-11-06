@@ -1,11 +1,10 @@
 (() => {
   const H = window.HOPNALITY;
-  const { flavours, questions, showdowns, heroLine, signOff, handle, hashtags } = H;
+  const { flavours, questions, heroLine, signOff, handle, hashtags } = H;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  // showdown: key into `showdowns` while the tie-break question is on screen, else null.
-  const state = { step: 0, picks: [], result: null, showdown: null };
+  const state = { step: 0, picks: [], result: null };
   const src = (new URLSearchParams(location.search).get("src") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
 
   // ---------- Anonymous analytics (api/track.php) ----------
@@ -43,15 +42,15 @@
   }
 
   function renderQuestion() {
-    const q = state.showdown ? showdowns[state.showdown] : questions[state.step];
+    const q = questions[state.step];
     const total = questions.length;
     const screen = $('[data-screen="question"]');
     $(".qtext", screen).textContent = q.q;
-    $(".progress__bar", screen).style.width = `${state.showdown ? 100 : ((state.step + 1) / total) * 100}%`;
+    $(".progress__bar", screen).style.width = `${((state.step + 1) / total) * 100}%`;
     $(".progress", screen).setAttribute("aria-valuenow", state.step + 1);
     $(".progress", screen).setAttribute("aria-valuemax", total);
-    $(".progress__label", screen).textContent = state.showdown ? "Tiebreak" : `${state.step + 1} of ${total}`;
-    $(".btn--back", screen).disabled = state.step === 0 && !state.showdown;
+    $(".progress__label", screen).textContent = `${state.step + 1} of ${total}`;
+    $(".btn--back", screen).disabled = state.step === 0;
 
     const answers = $(".answers", screen);
     answers.innerHTML = "";
@@ -59,7 +58,7 @@
       const b = document.createElement("button");
       b.className = "answer";
       b.textContent = text;
-      if (!state.showdown && state.picks[state.step] === flavour) b.classList.add("is-picked");
+      if (state.picks[state.step] === flavour) b.classList.add("is-picked");
       b.addEventListener("click", () => pick(flavour, b));
       answers.appendChild(b);
     });
@@ -73,12 +72,6 @@
     el.classList.add("is-picked");
     setTimeout(() => {
       locked = false;
-      if (state.showdown) {
-        const pair = state.showdown;
-        state.showdown = null;
-        reveal(flavour, pair);
-        return;
-      }
       state.picks[state.step] = flavour;
       if (state.step < questions.length - 1) {
         state.step++;
@@ -89,25 +82,42 @@
     }, 260);
   }
 
-  // Weighted tally (the brief: personality-led answers count more than occasion/channel ones).
-  // Returns the flavours with the top score: one winner, or the two tied.
-  function leaders(picks) {
+  // Client scoring, exactly as supplied in "UNICORN AF | DEVELOPER HANDOVER".
+  // New order: original Q1–Q3, Unicorn question, original Q4–Q6.
+  const PERSONALITY = [0, 1, 2, 4, 5];
+  const UNICORN_QUESTION = 3;
+  const ORIGINAL_Q5 = 5;
+  const FALLBACK = ["classic", "mango", "lime"]; // documented fixed fallback after original Q5
+
+  function score(picks) {
+    const original = PERSONALITY.map((i) => picks[i]);
+    const counts = { classic: 0, mango: 0, lime: 0 };
+    original.forEach((f) => counts[f]++);
+
+    const balanced = Object.values(counts).sort((a, b) => b - a).join("-") === "2-2-1";
+    if (picks[UNICORN_QUESTION] === "unicorn" && balanced) return "unicorn";
+
     const tally = { classic: 0, mango: 0, lime: 0 };
-    picks.forEach((f, i) => (tally[f] += questions[i].weight || 1));
+    original.forEach((f) => tally[f]++);
+    const extra = picks[UNICORN_QUESTION];
+    if (extra !== "unicorn") tally[extra]++;
     const top = Math.max(...Object.values(tally));
-    return Object.keys(tally).filter((f) => tally[f] === top);
+    const tied = Object.keys(tally).filter((f) => tally[f] === top);
+    if (tied.length === 1) return tied[0];
+    if (tied.includes(picks[ORIGINAL_Q5])) return picks[ORIGINAL_Q5];
+    return FALLBACK.find((f) => tied.includes(f));
   }
+
+  // Local QA hook; never exposed on the production hostname.
+  if (["localhost", "127.0.0.1"].includes(location.hostname)) window.__HOPNALITY_SCORE__ = score;
 
   function finish() {
-    const top = leaders(state.picks);
-    if (top.length === 1) return reveal(top[0], null);
-    state.showdown = top.sort().join("-");
-    renderQuestion();
+    reveal(score(state.picks));
   }
 
-  function reveal(flavour, tiebreak) {
+  function reveal(flavour) {
     state.result = flavour;
-    track("finish", { flavour, picks: state.picks.slice(0, questions.length), tiebreak });
+    track("finish", { flavour, picks: state.picks.slice(0, questions.length) });
     renderResult();
     show("loading");
     setTimeout(() => {
@@ -122,14 +132,22 @@
     const img = $(".card__photo img", screen);
     img.src = f.image;
     img.alt = `A can of hopnøsis ${f.name}`;
-    $(".card__name", screen).textContent = f.name;
-    $(".card__name", screen).style.setProperty("--flav", state.result === "classic" ? f.theme.accent : f.theme.bg);
+    $(".card__name", screen).textContent = f.displayName || f.name;
+    $(".card__name", screen).style.setProperty("--flav", ["classic", "unicorn"].includes(state.result) ? f.theme.accent : f.theme.bg);
     $(".card__words", screen).textContent = f.archetype;
     $(".card__wink", screen).textContent = f.line;
     $(".result__about", screen).textContent = f.about;
+    $(".result__eyebrow", screen).textContent = f.eyebrow || "You’re";
+    const reward = $(".unicorn-reward", screen);
+    reward.hidden = state.result !== "unicorn" || !H.event?.on;
+    if (!reward.hidden) {
+      $(".unicorn-reward__title", reward).textContent = H.unicornReward.title;
+      $(".unicorn-reward__body", reward).textContent = H.unicornReward.body;
+      $(".unicorn-reward__note", reward).textContent = H.unicornReward.note;
+    }
     const shop = $('[data-role="shop"]', screen);
     shop.href = f.shop;
-    shop.textContent = `Try your type: ${f.name} 4-pack`;
+    shop.textContent = state.result === "unicorn" ? "Shop the mixed pack" : `Try your type: ${f.name} 4-pack`;
     $(".hero-line", screen).textContent = heroLine;
     resetPanels();
   }
@@ -138,7 +156,6 @@
     state.step = 0;
     state.picks = [];
     state.result = null;
-    state.showdown = null;
     delete document.body.dataset.flavour;
     runId = api({ action: "start", source: src }).then((r) => (r && r.success ? r.data.id : null));
     renderQuestion();
@@ -258,6 +275,13 @@
     ctx.closePath();
   }
 
+  function drawContained(ctx, img, x, y, w, h) {
+    const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+    const iw = img.naturalWidth * scale;
+    const ih = img.naturalHeight * scale;
+    ctx.drawImage(img, x + (w - iw) / 2, y + (h - ih) / 2, iw, ih);
+  }
+
   async function drawCard(format) {
     const key = state.result;
     const f = flavours[key];
@@ -299,7 +323,8 @@
     ctx.save();
     roundRect(ctx, photo.x, photo.y, photo.s, photo.s, 40);
     ctx.clip();
-    ctx.drawImage(img, photo.x, photo.y, photo.s, photo.s);
+    if (key === "unicorn") drawContained(ctx, img, photo.x, photo.y, photo.s, photo.s);
+    else ctx.drawImage(img, photo.x, photo.y, photo.s, photo.s);
     ctx.restore();
 
     let y = photo.y + photo.s + (story ? 170 : 125);
@@ -460,10 +485,7 @@
     const action = e.target.closest("[data-action]")?.dataset.action;
     if (!action) return;
     if (action === "start") start();
-    if (action === "back" && state.showdown) {
-      state.showdown = null;
-      renderQuestion();
-    } else if (action === "back" && state.step > 0) {
+    if (action === "back" && state.step > 0) {
       state.step--;
       renderQuestion();
     }
@@ -476,15 +498,27 @@
     }
   });
 
-  // Warm the can images so the result card is instant.
-  Object.values(flavours).forEach((f) => loadImage(f.image));
+  // Warm the three visible flavours. Keep Unicorn's artwork off the wire until it is earned.
+  Object.entries(flavours).forEach(([key, f]) => key !== "unicorn" && loadImage(f.image));
 
-  // Test hook: ?result=lime jumps straight to a result screen (not tracked).
-  const forced = new URLSearchParams(location.search).get("result");
-  if (forced && flavours[forced]) {
-    state.result = forced;
+  const params = new URLSearchParams(location.search);
+  // Local QA hook: exercise the real scorer and result renderer without seven timed taps.
+  const forcedPicks = params.get("picks")?.split(",");
+  const localQa = ["localhost", "127.0.0.1"].includes(location.hostname);
+  if (localQa && forcedPicks?.length === questions.length) {
+    state.picks = forcedPicks;
+    state.result = score(forcedPicks);
     renderResult();
-    document.body.dataset.flavour = forced;
+    document.body.dataset.flavour = state.result;
     show("result");
+  // Result preview hook (not tracked).
+  } else {
+    const forced = params.get("result");
+    if (localQa && forced && flavours[forced]) {
+      state.result = forced;
+      renderResult();
+      document.body.dataset.flavour = forced;
+      show("result");
+    }
   }
 })();

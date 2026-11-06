@@ -5,7 +5,7 @@
 // No personal data: no IP, no email, no name. The row is addressed by a random token only the
 // browser that started the run knows.
 //
-// Actions: start {source} → {id} · finish {id, flavour, picks[6], tiebreak}
+// Actions: start {source} → {id} · finish {id, flavour, picks[7]}
 //          nail {id, value} · insight {id, age_band, city, suburb, channels[] | skipped}
 //          event {id, event: share|square|shop|mix|optin}
 declare(strict_types=1);
@@ -16,9 +16,9 @@ const AGE_BANDS = ['Under 18', '18–24', '25–34', '35–44', '45–54', '55+'
 const CITIES = ['Johannesburg', 'Pretoria', 'Cape Town', 'Durban', 'Gqeberha', 'Bloemfontein', 'Somewhere else'];
 const CHANNELS = ['supermarket', 'gym', 'bars', 'convenience', 'events', 'online'];
 const NAIL = ['classic', 'mango', 'lime', 'untried'];
-const TIEBREAKS = ['lime-mango', 'classic-lime', 'classic-mango'];
 const EVENTS = ['share' => 'shares', 'square' => 'squares', 'shop' => 'shop_clicks', 'mix' => 'mix_clicks', 'optin' => 'optins'];
-const QUESTIONS = 6;
+const QUESTIONS = 7;
+const ANSWERS = ['classic', 'mango', 'lime', 'unicorn'];
 
 $data = read_json_post();
 $db = db();
@@ -51,12 +51,11 @@ switch ($action) {
         $flavour = in_array($data['flavour'] ?? null, FLAVOURS, true) ? $data['flavour'] : null;
         $picks = $data['picks'] ?? null;
         if ($flavour === null || !is_array($picks) || count($picks) !== QUESTIONS
-            || array_diff($picks, FLAVOURS) !== []) {
+            || array_diff($picks, ANSWERS) !== []) {
             respond(422, false, 'Bad result.');
         }
-        $tiebreak = in_array($data['tiebreak'] ?? null, TIEBREAKS, true) ? $data['tiebreak'] : null;
         update($db, $token, 'finished_at = UTC_TIMESTAMP(), flavour = ?, picks = ?, tiebreak = ?',
-            [$flavour, implode(',', $picks), $tiebreak]);
+            [$flavour, implode(',', $picks), null]);
 
     case 'nail':
         $value = in_array($data['value'] ?? null, NAIL, true) ? $data['value'] : null;

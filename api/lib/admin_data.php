@@ -5,10 +5,11 @@
 declare(strict_types=1);
 require_once __DIR__ . '/admin_auth.php';
 
-const HQ_FLAVOURS = ['classic' => 'Classic AF', 'mango' => 'Mango AF', 'lime' => 'Lime AF'];
-const HQ_ARCHETYPES = ['classic' => 'The Smooth Operator', 'mango' => 'The Main Character', 'lime' => 'The Wild Card'];
-// Short names for the six questions, in quiz order (quiz/data.js).
-const HQ_QUESTIONS = ['Friday night', 'Your fridge', 'Friends say', 'Sipping situation', 'A new drink', 'Where to bump into us'];
+const HQ_FLAVOURS = ['classic' => 'Classic AF', 'mango' => 'Mango AF', 'lime' => 'Lime AF', 'unicorn' => 'Unicorn AF'];
+const HQ_ARCHETYPES = ['classic' => 'The Smooth Operator', 'mango' => 'The Main Character', 'lime' => 'The Wild Card', 'unicorn' => 'The Perfect Storm'];
+const HQ_REAL_FLAVOURS = ['classic' => 'Classic AF', 'mango' => 'Mango AF', 'lime' => 'Lime AF'];
+// Short names for the seven questions, in quiz order (quiz/data.js).
+const HQ_QUESTIONS = ['Friday night', 'Your fridge', 'Friends say', 'Versions of you', 'Sipping situation', 'A new drink', 'Where to bump into us'];
 const HQ_CHANNELS = ['supermarket' => 'Supermarket', 'gym' => 'Gym or padel', 'bars' => 'Restaurants and bars',
     'convenience' => 'Petrol or convenience', 'events' => 'Festivals and events', 'online' => 'Online'];
 const HQ_AGE_BANDS = ['Under 18', '18–24', '25–34', '35–44', '45–54', '55+'];
@@ -77,7 +78,7 @@ function overview(array $q): array
         $matrix[$r['flavour']][$r['nailed']] = (int)$r['n'];
     }
     $actual = [];
-    foreach (array_merge(HQ_FLAVOURS, ['untried' => 'Haven’t tried yet']) as $key => $label) {
+    foreach (array_merge(HQ_REAL_FLAVOURS, ['untried' => 'Haven’t tried yet']) as $key => $label) {
         $actual[] = ['key' => $key, 'label' => $label, 'count' => array_sum(array_map(fn($row) => $row[$key] ?? 0, $matrix))];
     }
 
@@ -214,7 +215,7 @@ function export_runs(array $q): int
     $rows = qall("SELECT started_at, finished_at, source, flavour, tiebreak, picks, nailed, age_band, city, suburb, channels, insight_skipped,
         shares, squares, shop_clicks, mix_clicks, optins FROM results$w ORDER BY id", $a);
     return csv_out('hopnosis-quiz-runs-' . gmdate('Ymd-His') . '.csv',
-        ['Started (UTC)', 'Finished (UTC)', 'Source', 'Result', 'Tiebreak', 'Picks Q1–Q6', 'Actual favourite', 'Age', 'City', 'Suburb',
+        ['Started (UTC)', 'Finished (UTC)', 'Source', 'Result', 'Legacy tiebreak', 'Picks Q1–Q7', 'Actual favourite', 'Age', 'City', 'Suburb',
             'Where they’d buy', 'Skipped questions', 'Shares', 'Square saves', 'Shop clicks', 'Mixed pack clicks', 'Opted in'],
         array_map(fn($r) => array_values($r), $rows));
 }

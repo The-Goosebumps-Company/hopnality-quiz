@@ -10,7 +10,7 @@
 - `data.js`: **all copy, scoring and shop links**. Edit this to change wording.
 - `app.js`: quiz flow, scoring, and share-card image generation (canvas)
 - `styles.css`: themes per flavour (Classic black/gold, Mango orange, Lime green)
-- `assets/can-*.jpg`: single-can photos pulled from the hopnosis.co.za Shopify store
+- `assets/can-*`: the three shop can photos plus the client-supplied Unicorn AF artwork
 - `api/`: `subscribe.php` (email sign-up), `track.php` (anonymous per-run stats), `lib.php` (shared helpers), `schema.sql`
 - `deploy/`: `deploy.sh`, `server-setup.sh`, `stats.sh`, `export-subscribers.sh`
 - `print/`: the A4 QR poster (`poster.html`, run `print/render.sh` to rebuild `print/out/*.pdf|png`) and QR SVGs for the poster (`?src=poster`) and the board (`?src=board`). These are not published with the site.
@@ -19,18 +19,18 @@
 ```bash
 python3 -m http.server 8765 --directory quiz
 ```
-Then open http://localhost:8765. To jump straight to a result, add `?result=classic`, `?result=mango` or `?result=lime`.
+Then open http://localhost:8765. To jump straight to a result, add `?result=classic`, `?result=mango`, `?result=lime` or `?result=unicorn`.
 
 ## How it works
-- **Questions:** the brief's six questions, three answers each, shown in random order.
-- **Scoring:** weighted, as the brief asks. Personality questions Q1, Q2, Q3 and Q5 count 2 points; occasion and channel questions Q4 and Q6 count 1 (`weight` in `data.js`). That's 10 points in all, so a three-way tie can't happen. When two flavours tie, a showdown question with just those two decides it (`showdowns`).
+- **Questions:** the client brief's six questions stay verbatim. The Unicorn handover inserts one supplied four-answer question after original Q3, making seven questions; answers are shuffled.
+- **Scoring:** original Q1–Q5 count one point each. New Q4 adds a regular flavour point or sets the Unicorn candidate flag. Unicorn requires that flag plus a 2–2–1 split across the original five personality answers. Otherwise the regular high score wins; a tie uses original Q5, then Classic → Mango → Lime as the fixed fallback. Original Q6/new Q7 is analytics-only.
 - **Result screen:** the archetype card, a 2–3 sentence description, **Try your type** (that flavour's 4-pack, The Quartet), Share and Save square.
 - **Under the result:**
   - **Did we nail it?** asks for their actual favourite, which is stored separately from the quiz result.
   - **Try all three** links to the mixed 6-pack.
   - **Optional research questions:** age band, city, suburb and where they'd buy. They're anonymous and skippable.
   - **The email opt-in**, kept separate.
-- **Stats:** every run is one anonymous row in `results` (`api/track.php`), with no IP, name or email. It records start and finish, the flavour, the picks, the tiebreak, "Did we nail it?", the research answers, and share, shop, mixed-pack and opt-in clicks. Where there's no backend (the GitHub Pages preview), tracking does nothing.
+- **Stats:** every run is one anonymous row in `results` (`api/track.php`), with no IP, name or email. It records start and finish, the result (including Unicorn AF), all seven picks, "Did we nail it?", the research answers, and share, shop, mixed-pack and opt-in clicks. Where there's no backend (the GitHub Pages preview), tracking does nothing.
 - **Share** builds a 1080×1920 story image. On phones it opens the native share sheet. On desktop it downloads the image and copies the caption.
 - **Save square image** builds a 1080×1080 image.
 
@@ -112,5 +112,5 @@ After the domain works:
 - **Mango can photo** is the shop image, which still shows the old "MOJO" label. Swap in the current Mango AF shot from the 22 Oct shoot.
 - **Classic can photo** is low resolution (570px). Swap it for a shoot pack shot.
 - Fonts come from Google Fonts (Jost) and fall back to system fonts if they're blocked. Swap in the brand font if one exists.
-- **No email capture or analytics yet.** Both wait on the open data-capture decision. Adding them will need a small backend or a form service, plus a consent line.
+- **Unicorn reward redemption is not defined.** The client handover asks QA to test duplicate QR redemption, but does not define the QR, staff scanner, redemption authority or failure states. The event reward copy is live for Unicorn results; a secure single-use redemption flow needs that product decision.
 - Hero line uses "Even **if** you don't" (Author's Guide). The if/when wording is still open.

@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>What the AF are you? | hopnøsis</title>
-  <meta name="description" content="Three flavours. Three personalities. Six questions. Find out what the AF you are.">
+  <meta name="description" content="Three flavours. Three personalities. Seven questions. Find out what the AF you are.">
   <meta name="theme-color" content="#0d0d0d">
   <meta property="og:title" content="What the AF are you?">
-  <meta property="og:description" content="Six questions. No wrong answers. Some mildly concerning revelations.">
+  <meta property="og:description" content="Seven questions. No wrong answers. Some mildly concerning revelations.">
   <meta property="og:image" content="assets/can-classic.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +41,7 @@
     <section class="screen screen--question" data-screen="question">
       <header class="qhead">
         <button class="btn--back" data-action="back" aria-label="Previous question">←</button>
-        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="6" aria-valuenow="1">
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="1">
           <div class="progress__bar"></div>
         </div>
         <span class="progress__label"></span>
@@ -67,6 +67,11 @@
         <p class="card__wink"></p>
       </article>
       <p class="result__about"></p>
+      <section class="panel unicorn-reward" hidden>
+        <h3 class="panel__title unicorn-reward__title"></h3>
+        <p class="panel__body unicorn-reward__body"></p>
+        <p class="unicorn-reward__note"></p>
+      </section>
       <div class="result__actions">
         <a class="btn btn--primary" data-role="shop" data-track="shop" target="_blank" rel="noopener"></a>
         <button class="btn btn--ghost" data-action="share">Share your result</button>

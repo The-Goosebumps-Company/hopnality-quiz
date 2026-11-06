@@ -26,7 +26,7 @@ module.exports = {
         brand: { DEFAULT: '#0d0d0d', hover: '#2c2a27', soft: '#ecebe7' },
         accent: { DEFAULT: '#b37a00', strong: '#8a5d00', soft: '#f7efdc' },
         gold: { DEFAULT: '#1a8f9a', soft: '#e2f4f5', ink: '#0e6168' },
-        flavour: { classic: '#cc8a00', mango: '#ffb33f', lime: '#97d700', ink: '#141414' },
+        flavour: { classic: '#cc8a00', mango: '#ffb33f', lime: '#97d700', unicorn: '#70e4ea', ink: '#141414' },
         success: { DEFAULT: '#2d6b46', soft: '#e7f2eb' },
         danger: { DEFAULT: '#a3352b', soft: '#fbecea' },
       },

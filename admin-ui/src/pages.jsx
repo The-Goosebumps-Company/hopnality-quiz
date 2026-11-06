@@ -12,6 +12,7 @@ const FLAVOURS = {
   classic: { label: 'Classic AF', archetype: 'The Smooth Operator', bar: 'bg-flavour-classic', dot: 'bg-flavour-classic' },
   mango: { label: 'Mango AF', archetype: 'The Main Character', bar: 'bg-flavour-mango', dot: 'bg-flavour-mango' },
   lime: { label: 'Lime AF', archetype: 'The Wild Card', bar: 'bg-flavour-lime', dot: 'bg-flavour-lime' },
+  unicorn: { label: 'Unicorn AF', archetype: 'The Perfect Storm', bar: 'bg-flavour-unicorn', dot: 'bg-flavour-unicorn' },
 };
 const SOURCES = { can: 'Can QR (Taplink)', poster: 'Poster', board: 'Event board', none: 'Direct link', test: 'Test' };
 const sourceLabel = (s) => SOURCES[s] || s;
@@ -104,7 +105,7 @@ export function Overview() {
         return (
           <>
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-              <Kpi icon={UsersThree} label="Started" value={k.started} sub={`${fmt.format(k.tiebreaks)} needed a tiebreak`} />
+              <Kpi icon={UsersThree} label="Started" value={k.started} sub={`${fmt.format(d.flavours.find((f) => f.key === 'unicorn')?.count || 0)} unlocked Unicorn AF`} />
               <Kpi icon={CheckCircle} label="Finished" value={finished} sub={`${pct(finished, k.started)}% completion`} help="Reached a result. Completion = finished ÷ started." />
               <Kpi icon={Target} label="Did we nail it?" value={judged ? `${pct(k.nail_right, judged)}%` : '—'} sub={`${fmt.format(k.nail_right)} of ${fmt.format(judged)} said yes`} help="Share of people whose actual favourite matched their quiz result. Excludes “Haven’t tried them yet”." />
               <Kpi icon={EnvelopeSimple} label="Email sign-ups" value={k.signups} tone="gold" sub={`${pct(k.optins, finished)}% of finishers opted in`} />

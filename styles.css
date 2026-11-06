@@ -15,6 +15,7 @@
 body[data-flavour="classic"] { --bg: #0d0d0d; --ink: #f4efe4; --muted: rgba(244,239,228,.66); --line: rgba(204,138,0,.45); --accent: #cc8a00; --accent-ink: #0d0d0d; }
 body[data-flavour="mango"]   { --bg: #ffb33f; --ink: #141414; --muted: rgba(20,20,20,.72); --line: rgba(20,20,20,.25); --accent: #141414; --accent-ink: #ffb33f; }
 body[data-flavour="lime"]    { --bg: #97d700; --ink: #141414; --muted: rgba(20,20,20,.72); --line: rgba(20,20,20,.25); --accent: #141414; --accent-ink: #97d700; }
+body[data-flavour="unicorn"] { --bg: #0d0d0d; --ink: #f4efe4; --muted: rgba(244,239,228,.72); --line: rgba(112,228,234,.42); --accent: #70e4ea; --accent-ink: #0d0d0d; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 [hidden] { display: none !important; }
@@ -113,10 +114,11 @@ body[data-flavour="classic"] :focus-visible, body:not([data-flavour]) :focus-vis
 }
 .card__photo { aspect-ratio: 1 / 1; overflow: hidden; }
 .card__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+body[data-flavour="unicorn"] .card__photo img { object-fit: contain; background: #050505; }
 .card__name { font-size: clamp(42px, 12vw, 56px); font-weight: 800; letter-spacing: -.03em; line-height: 1; margin-top: -8px; color: var(--flav, #f4efe4); }
 .card__words { font-size: 20px; letter-spacing: .04em; font-weight: 700; margin-top: 10px; opacity: .95; }
 .card__wink { font-size: 18px; font-style: italic; margin: 12px 24px 0; opacity: .8; }
-.result__about { font-size: 18px; line-height: 1.5; }
+.result__about { font-size: 18px; line-height: 1.5; white-space: pre-line; }
 .result__actions { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .result__again { font-size: 15px; color: var(--muted); text-align: center; }
 .result__foot { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
@@ -139,6 +141,9 @@ body[data-flavour="classic"] :focus-visible, body:not([data-flavour]) :focus-vis
 .chip.is-on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .mixed { text-align: center; align-items: center; }
 .mixed__line { font-size: 18px; font-weight: 700; line-height: 1.35; max-width: 28ch; }
+.unicorn-reward { border-color: #70e4ea; box-shadow: 0 0 24px rgba(112,228,234,.14); }
+.unicorn-reward__title { text-transform: uppercase; color: #70e4ea; }
+.unicorn-reward__note { font-size: 15px; line-height: 1.45; font-weight: 700; }
 .insight__group { border: 0; display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
 .insight__group legend { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
 .insight__suburb { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); margin-top: 4px; }

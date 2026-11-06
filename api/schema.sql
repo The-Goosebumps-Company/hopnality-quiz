@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `results` (
     `finished_at` DATETIME NULL,              -- NULL = didn't finish
     `flavour` VARCHAR(8) NULL,                -- quiz result
     `picks` VARCHAR(64) NULL,                 -- flavour picked per question, comma separated
-    `tiebreak` VARCHAR(16) NULL,              -- tied pair when the showdown decided it
+    `tiebreak` VARCHAR(16) NULL,              -- legacy pre-Unicorn showdown; new runs leave this NULL
     `nailed` VARCHAR(8) NULL,                 -- "Did we nail it?": actual favourite or 'untried'
     `age_band` VARCHAR(16) NULL,
     `city` VARCHAR(32) NULL,

@@ -8,7 +8,7 @@ const SHOP = "https://hopnosis.co.za/products/";
 window.HOPNALITY = {
   welcome: {
     title: "What the AF are you?",
-    body: "Three flavours. Three personalities. One questionable sense of self-awareness. Six questions. No wrong answers. Some mildly concerning revelations.",
+    body: "Three flavours. Three personalities. One questionable sense of self-awareness. Seven questions. No wrong answers. Some mildly concerning revelations.",
   },
 
   flavours: {
@@ -43,16 +43,25 @@ window.HOPNALITY = {
       shop: SHOP + "ime-af-the-quartet", // sic: the shop's Lime Quartet URL is missing its "l"
       theme: { bg: "#97d700", ink: "#141414", accent: "#141414" },
     },
+    unicorn: {
+      name: "Unicorn AF",
+      displayName: "YOU’RE UNICORN AF.",
+      eyebrow: "Well, this is awkward…",
+      archetype: "THE PERFECT STORM.",
+      line: "The confidence of Classic. The charisma of Mango. The cheek of Lime.",
+      about:
+        "You’re the voice of reason and the reason everyone needs one.\n\nYou’re not one flavour. You’re the whole damn fridge.\n\nCongratulations. You’re a lot. Fortunately, we made a 4-pack.",
+      image: "assets/can-unicorn.png",
+      shop: SHOP + "the-middle-ground-6-can-mixed-pack",
+      theme: { bg: "#0d0d0d", ink: "#f4efe4", accent: "#70e4ea" },
+    },
   },
 
-  // The brief's six questions. A = Classic, B = Mango, C = Lime; answers are shuffled on screen.
-  // Weight: the brief says personality-led answers count more than occasion/channel answers,
-  // so Q4 (sipping situation) and Q6 (where to bump into us) count 1, the rest count 2.
-  // Total is 10 points, so a three-way tie can't happen; two-way ties go to a showdown.
+  // The client's six original questions remain verbatim. Her supplied Unicorn candidate question
+  // is inserted after original Q3. Scoring is implemented in app.js exactly as the handover says.
   questions: [
     {
       q: "Friday. Your personality has officially clocked out. Where are we finding you?",
-      weight: 2,
       a: [
         ["classic", "At a braai, holding the tongs. Nobody asked me to take charge."],
         ["mango", "Poolside, music on, surrounded by my favourite bad influences."],
@@ -61,7 +70,6 @@ window.HOPNALITY = {
     },
     {
       q: "Open your fridge. What are we dealing with?",
-      weight: 2,
       a: [
         ["classic", "Everything in its place. Even the chaos is organised."],
         ["mango", "Leftovers, three sauces and enough drinks for unexpected guests."],
@@ -69,8 +77,7 @@ window.HOPNALITY = {
       ],
     },
     {
-      q: "Your friends have described you as…",
-      weight: 2,
+      q: "Your friends have described you as...",
       a: [
         ["classic", "The one who keeps it cool when everyone else loses the plot."],
         ["mango", "The one who turns a quick drink into an entire occasion."],
@@ -78,8 +85,17 @@ window.HOPNALITY = {
       ],
     },
     {
+      q: "Be honest. How many versions of you are we dealing with?",
+      unicornCandidate: true,
+      a: [
+        ["classic", "One. Consistently cool. I know who I am."],
+        ["mango", "The social version. The fun version. Both excellent company."],
+        ["lime", "Depends who’s asking. And what they’ve heard."],
+        ["unicorn", "Responsible adult by day. Absolute legend by night. Occasionally both before lunch."],
+      ],
+    },
+    {
       q: "Pick your ideal sipping situation.",
-      weight: 1,
       a: [
         ["classic", "Sunset, good company, something cold. Nothing complicated."],
         ["mango", "Pool party, festival, rooftop or wherever the gees is."],
@@ -88,7 +104,6 @@ window.HOPNALITY = {
     },
     {
       q: "Someone offers you a drink you've never tried. Your reaction?",
-      weight: 2,
       a: [
         ["classic", "What's in it? I have questions. And standards."],
         ["mango", "I'm in. Give me the coldest one."],
@@ -97,7 +112,7 @@ window.HOPNALITY = {
     },
     {
       q: "Where would you most want to bump into hopnøsis?",
-      weight: 1,
+      analyticsOnly: true,
       a: [
         ["classic", "My favourite restaurant, bar or a proper braai."],
         ["mango", "At a festival, poolside or a weekend market."],
@@ -106,30 +121,10 @@ window.HOPNALITY = {
     },
   ],
 
-  // Tie-break (the brief: "a predetermined tie-break question or rule"). DRAFT copy.
-  // Keyed by the two tied flavours, sorted alphabetically. Only the tied two appear.
-  showdowns: {
-    "lime-mango": {
-      q: "Too close to call. Pick a plan.",
-      a: [
-        ["mango", "Make it an occasion."],
-        ["lime", "Make it up as we go."],
-      ],
-    },
-    "classic-lime": {
-      q: "Too close to call. Pick a move.",
-      a: [
-        ["classic", "Stay cool."],
-        ["lime", "Go rogue."],
-      ],
-    },
-    "classic-mango": {
-      q: "Too close to call. Pick an entrance.",
-      a: [
-        ["classic", "Quietly. They'll notice."],
-        ["mango", "Loudly. They'll remember."],
-      ],
-    },
+  unicornReward: {
+    title: "You’ve unlocked Unicorn status.",
+    body: "Report to the hopnøsis bar. There’s a free slushie with your name on it.",
+    note: "One free slushie. Zero official responsibilities. Unofficial ambassador status granted.",
   },
 
   // After the result (the brief's "optional insight capture" and commercial CTA).
