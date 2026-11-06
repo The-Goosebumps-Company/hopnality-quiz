@@ -47,6 +47,32 @@ On the result screen, people can leave an email address and tick a consent box. 
 - **Not built yet:** unsubscribing is handled by whatever tool sends the emails later. Import from the CSV, and remove anyone who unsubscribes from the database too.
 - **Preview copy:** the sign-up form only works on the server. On the GitHub Pages copy it shows "That didn't go through".
 
+## Admin for Kelly (`/admin`)
+`https://quiz.hopnosis.co.za/admin/` is a dashboard **reused from the PowerHER admin** (`investec powerher/server`). The code was copied, not shared at runtime: it runs on the quiz's own database, PHP pool and user, and never touches PowerHER's.
+- **Copied:**
+  - `api/lib/admin_auth.php` and `api/lib/mfa.php`: invite-only accounts, password policy plus the breached-password check, lockouts, mandatory TOTP 2FA (a password alone only earns a 2FA challenge), step-up 2FA for exports and team changes, and the audit log.
+  - The React/Vite/Tailwind UI in `admin-ui/`: sign-in, 2FA, Team, Account, and the KPI, chart and table components.
+- **Changed:**
+  - The `hq_*` helpers (`api/lib/core.php`) replace PowerHER's.
+  - Its own cookies (`__Host-hq_admin` and `__Host-hq_mfa`).
+  - An `admin_rate_limits` table.
+  - The WebSocket live layer became 10-second polling.
+  - hopnøsis branding.
+- **Pages:**
+  - **Overview:** completion, flavour split, "Did we nail it?" matrix, click-throughs, sources, activity by hour or day, latest results.
+  - **Insights:** where they'd buy, age, city, suburbs, and which flavour each question pulls towards.
+  - **Sign-ups:** the email list and a CSV download (needs a fresh 2FA code).
+  - **Team and Account.**
+  - Every page filters by day (SAST) and source.
+- **API:** `api/admin.php?action=…`, the same flow as PowerHER's `admin-api.php`. Data queries are in `api/lib/admin_data.php`.
+- **First owner** (on the server, after deploying):
+  ```bash
+  ssh powerher 'sudo -u hopnosis php /var/www/quiz.hopnosis.co.za/current/bin/invite-owner.php kelly@theliquidcollective.co.za'
+  ```
+  Send Kelly the printed link (valid 7 days). She chooses a password and scans the 2FA QR code with an authenticator app. After that she invites the others from the Team page.
+- **Build:** `deploy/deploy.sh` builds `admin-ui` from the deployed commit into `release/admin`. Locally: `cd admin-ui && npm ci && npx vite build`.
+- **Server setup:** adds a `data_key` to `settings.php` (encrypts 2FA secrets), the admin CSP (same as PowerHER's), and denies `/api/lib/` and `/bin/`.
+
 ## Numbers
 ```bash
 deploy/stats.sh               # completion, flavour split, nail-it hit rate, shares/clicks, opt-in rate, age, city, channels
