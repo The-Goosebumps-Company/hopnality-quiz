@@ -49,6 +49,11 @@ return [
 EOF
   umask 022
 fi
+# Quiz admin: a separate 32-byte key encrypts 2FA secrets at rest (libsodium secretbox), as in PowerHER.
+if ! grep -q "'data_key'" "$BASE/shared/config/settings.php"; then
+  DATAKEY=$(openssl rand -base64 32)
+  sed -i "s|^\];|    'data_key' => '$DATAKEY',\n];|" "$BASE/shared/config/settings.php"
+fi
 chown root:"$APPUSER" "$BASE/shared/config/settings.php"; chmod 640 "$BASE/shared/config/settings.php"
 # Schema lives in the release (api/schema.sql) once the intake form exists.
 # Applied from the release about to go live (deploy.sh passes its path), before the flip.
@@ -99,6 +104,10 @@ cat > /etc/apache2/hopnosis-quiz-app.conf <<EOF
     <LocationMatch "\.(sql|md|sh)\$">
         Require all denied
     </LocationMatch>
+    # PHP libraries and the CLI are never web-reachable (they also 404 themselves).
+    <LocationMatch "^/(api/lib|bin)/">
+        Require all denied
+    </LocationMatch>
     <If "! %{REQUEST_METHOD} in { 'GET', 'HEAD', 'POST' }">
         Require all denied
     </If>
@@ -117,7 +126,17 @@ cat > /etc/apache2/hopnosis-quiz-app.conf <<EOF
     <LocationMatch "^/assets/">
         Header set Cache-Control "public, max-age=86400"
     </LocationMatch>
-    AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+    # Quiz admin (React app copied from PowerHER's admin): same CSP as PowerHER's /admin,
+    # plus Google Fonts for Jost. Hashed build files cache forever; index.html never does.
+    <Directory $BASE/current/admin>
+        DirectoryIndex index.html
+        Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        Header always set X-Robots-Tag "noindex, nofollow"
+    </Directory>
+    <LocationMatch "^/admin/assets/">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </LocationMatch>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json image/svg+xml
 
     ErrorLog \${APACHE_LOG_DIR}/hopnosis-quiz-error.log
     CustomLog \${APACHE_LOG_DIR}/hopnosis-quiz-access.log combined

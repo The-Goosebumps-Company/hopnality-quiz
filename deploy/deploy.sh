@@ -14,7 +14,7 @@ DOMAIN=quiz.hopnosis.co.za
 BASE=/var/www/$DOMAIN
 KEEP=5
 # What gets published. Anything else in the repo (README, deploy/, .nojekyll) stays private.
-WEB_PATHS=(index.html styles.css data.js app.js assets api)
+WEB_PATHS=(index.html styles.css data.js app.js assets api bin)   # bin/ is CLI only: Apache denies it
 
 SSH=(ssh -o BatchMode=yes "$HOST")
 
@@ -29,7 +29,12 @@ smoke() {  # Ask the box's own Apache for the live site, by name.
     \$C \$U/ | grep -q 'data-screen=\"welcome\"'
     # Sign-up endpoint: a honeypot hit reaches the DB (rate limit) but stores nothing.
     if \$C -o /dev/null \$U/api/subscribe.php -H 'Content-Type: application/json' -H \"Origin: \$U\" \\
-         -d '{\"website\":\"smoke-test\"}' 2>/dev/null || [ ! -e $BASE/current/api ]; then :; else exit 1; fi"
+         -d '{\"website\":\"smoke-test\"}' 2>/dev/null || [ ! -e $BASE/current/api ]; then :; else exit 1; fi
+    # Quiz admin: the app shell loads and the API answers (signed out).
+    if [ -e $BASE/current/admin ]; then
+      \$C \$U/admin/ | grep -q 'id=\"root\"'
+      \$C \$U/api/admin.php?action=me | grep -q '\"user\":null'
+    fi"
 }
 
 case "${1:-}" in
@@ -62,6 +67,15 @@ STAGE=$(mktemp -d); trap 'rm -rf "$STAGE"' EXIT
 mkdir -p "$STAGE/release"
 git archive "$COMMIT" "${PRESENT[@]}" | tar -x -C "$STAGE/release"
 git archive "$COMMIT" deploy/server-setup.sh | tar -x -C "$STAGE"
+
+# Quiz admin: build the React app from the same commit into release/admin (node_modules from this checkout).
+if git cat-file -e "$COMMIT:admin-ui" 2>/dev/null; then
+  [ -d admin-ui/node_modules ] || (cd admin-ui && npm ci --silent)
+  mkdir -p "$STAGE/admin-src"
+  git archive "$COMMIT" admin-ui | tar -x -C "$STAGE/admin-src"
+  ln -s "$PWD/admin-ui/node_modules" "$STAGE/admin-src/admin-ui/node_modules"
+  (cd "$STAGE/admin-src/admin-ui" && npx vite build --logLevel warn --outDir "$STAGE/release/admin" --emptyOutDir)
+fi
 
 # 1. Upload the new release beside the live one (hard-links unchanged files).
 "${SSH[@]}" "test -d $BASE/releases" || {
