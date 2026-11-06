@@ -71,7 +71,9 @@ deploy/deploy.sh rollback   # flip back to the previous release
 ```
 You need Tailscale switched on and the `powerher` SSH host (see the PowerHER runbook). Only `index.html`, `styles.css`, `data.js`, `app.js`, `assets/` and `api/` are published.
 
-`deploy/server-setup.sh` is idempotent and runs on every deploy. Once `quiz.hopnosis.co.za` resolves to the VM, it issues the Let's Encrypt certificate and switches the site to HTTPS. **Needed:** an `A` record `quiz → 154.65.107.108` in **Cloudflare**, where hopnosis.co.za's DNS lives (not Afrihost). Set it to DNS only (grey cloud). Then run `deploy/deploy.sh` again.
+`deploy/server-setup.sh` is idempotent and runs on every deploy.
+- **DNS:** `A quiz → 154.65.107.108`, DNS only (grey cloud), in the **Cloudflare** zone (account "Moniquehoffman@gmail.com's Account"). Added on 6 Nov. hopnosis.co.za's DNS is on Cloudflare, not Afrihost.
+- **HTTPS:** Let's Encrypt, issued 6 Nov and renewed automatically by certbot's timer. HTTP redirects to HTTPS, and HSTS is on.
 
 **Preview copy:** https://the-goosebumps-company.github.io/hopnality-quiz/ is served by GitHub Pages from the public repo, `main` branch. Don't push `deploy/` to that public repo, because it describes the server.
 
