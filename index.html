@@ -11,7 +11,7 @@
   <meta property="og:image" content="assets/can-classic.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;700;800&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,13 +19,22 @@
 
     <!-- Welcome -->
     <section class="screen screen--welcome is-active" data-screen="welcome">
-      <p class="wordmark">hopnøsis</p>
-      <div class="welcome__body">
-        <h1 class="welcome__title">What the AF are you?</h1>
-        <p class="lede"></p>
-        <button class="btn btn--primary" data-action="start">Find out</button>
+      <!-- House of Hops event look (PowerHER, 7 Nov): swirls and bubbles from the cups and loop video. -->
+      <div class="fx" aria-hidden="true">
+        <img class="swirl swirl--a" src="assets/swirl.png" alt="">
+        <img class="swirl swirl--b" src="assets/swirl.png" alt="">
+        <span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span>
+        <span class="bubble"></span><span class="bubble"></span><span class="bubble"></span><span class="bubble"></span>
       </div>
-      <p class="fineprint">Takes about a minute. Ø ALC | Ø CAL | Ø SUG</p>
+      <img class="logo" src="assets/logo-white-gold.png" alt="hopnøsis" width="800" height="240">
+      <div class="welcome__body">
+        <p class="event" hidden><span class="neon-script">The</span> <span class="event__name">House of Hops</span><span class="event__where"></span></p>
+        <h1 class="welcome__title">What the <span class="neon">AF</span><br>are you?</h1>
+        <p class="lede"></p>
+        <button class="btn btn--primary btn--glow" data-action="start">Find out</button>
+        <p class="welcome__time">Takes about a minute.</p>
+      </div>
+      <p class="fineprint">Sparkling hop W∆TR · Ø ALC | Ø CAL | Ø SUG <span class="egg">Nº 111</span></p>
     </section>
 
     <!-- Question -->
@@ -45,6 +54,7 @@
     <section class="screen screen--loading" data-screen="loading">
       <div class="bubbles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
       <p class="loading__text">Reading your bubbles…</p>
+      <p class="loading__hop neon-script">You've been hopnotised.</p>
     </section>
 
     <!-- Result -->

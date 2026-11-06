@@ -154,6 +154,10 @@ window.HOPNALITY = {
     url: SHOP + "the-middle-ground-6-can-mixed-pack",
   },
 
+  // Event badge on the welcome screen ("The House of Hops", as on Kelly's PowerHER menu).
+  // Set on: false after the event and the welcome screen goes back to plain.
+  event: { on: true, where: "PowerHER Fit Fest" },
+
   heroLine: "A drink that behaves. Even if you don't.",
   signOff: "SIP HAPPENS™",
   handle: "@hopnosis_official", // Instagram, from the 5 Nov creator DMs in the Blueprint

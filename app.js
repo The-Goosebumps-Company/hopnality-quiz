@@ -448,7 +448,10 @@
 
   // ---------- Wiring ----------
   $(".lede").textContent = H.welcome.body;
-  $(".welcome__title").textContent = H.welcome.title;
+  if (H.event && H.event.on) {
+    $(".event__where").textContent = H.event.where || "";
+    $(".event").hidden = false;
+  }
   buildChips();
 
   document.addEventListener("click", (e) => {
