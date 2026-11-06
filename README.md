@@ -24,9 +24,27 @@ Then open http://localhost:8765. To jump straight to a result, add `?result=clas
 - **Save square image** builds a 1080×1080 image.
 
 ## Deploy
-**Live:** https://the-goosebumps-company.github.io/hopnality-quiz/ (GitHub Pages, repo `The-Goosebumps-Company/hopnality-quiz`, `main` branch, root). Pushing to `main` redeploys within about a minute. The repo is public because the org is on the free plan.
+**Production: https://quiz.hopnosis.co.za** runs on the PowerHER Xneelo VM (`154.65.107.108`), set up the same way as Pulse's staging and production:
+- **Folders:** `/var/www/quiz.hopnosis.co.za/` holds `releases/<timestamp>`, a `current` symlink, and `shared/` (`config`, `data`, `backups`).
+- **Kept apart from PowerHER:**
+  - its own `hopnosis` Linux user
+  - its own PHP-FPM pool (`hopnosis-quiz`), using `open_basedir` to limit it to its own folder
+  - its own vhost file named after the domain, and its own logs (`hopnosis-quiz-*.log`)
+  - its own `hopnosis` database and DB user on the shared MariaDB
+  - hourly encrypted backups
 
-The folder can also go on any other static host (Kelly's/company hosting, Netlify, and so on). Then:
+```bash
+deploy/deploy.sh            # deploy HEAD (committed files only)
+deploy/deploy.sh releases   # list releases, * = live
+deploy/deploy.sh rollback   # flip back to the previous release
+```
+You need Tailscale switched on and the `powerher` SSH host (see the PowerHER runbook). Only `index.html`, `styles.css`, `data.js`, `app.js`, `assets/` and `api/` are published.
+
+`deploy/server-setup.sh` is idempotent and runs on every deploy. Once `quiz.hopnosis.co.za` resolves to the VM, it issues the Let's Encrypt certificate and switches the site to HTTPS. **Needed:** an `A` record `quiz → 154.65.107.108` in **Cloudflare**, where hopnosis.co.za's DNS lives (not Afrihost). Set it to DNS only (grey cloud). Then run `deploy/deploy.sh` again.
+
+**Preview copy:** https://the-goosebumps-company.github.io/hopnality-quiz/ is served by GitHub Pages from the public repo, `main` branch. Don't push `deploy/` to that public repo, because it describes the server.
+
+After the domain works:
 1. Strip the Taplink page (taplink.cc/hopnosis.co.za) down to a welcome and one **"Fill in the quiz"** button pointing at the quiz URL. Add `?src=can` to the button link if we want to track it later.
 2. Scan a real can and check the whole path on a phone.
 
