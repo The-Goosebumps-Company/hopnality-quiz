@@ -23,6 +23,19 @@ Then open http://localhost:8765. To jump straight to a result, add `?result=clas
 - **Share** builds a 1080×1920 story image. On phones it opens the native share sheet. On desktop it downloads the image and copies the caption.
 - **Save square image** builds a 1080×1080 image.
 
+## Email sign-up ("Join the Hopnotised")
+On the result screen, people can leave an email address and tick a consent box. The box is never pre-ticked.
+- **What happens on submit:** the form sends `{email, consent, flavour, source, started_at, website}` to `api/subscribe.php`. That stores one row per email in `subscribers`, along with the exact consent wording, the time (UTC), the IP address and the browser. If the same email signs up again, its consent record is updated. `source` comes from `?src=` on the quiz link, for example `?src=can`.
+- **Abuse protection,** borrowed from Pulse's public contact form:
+  - a hidden `website` honeypot and a 2-second minimum before submitting. Bots get a normal "You're in" response and nothing is stored.
+  - 40 requests per IP every 5 minutes. That's generous on purpose, because a venue's Wi-Fi puts everyone behind one IP.
+  - only same-origin JSON requests are accepted.
+  - there's no CAPTCHA, and no email is sent for each sign-up.
+- **Wording:** the consent text lives in two places, `index.html` and `CONSENT_TEXT` in `api/subscribe.php`. Change both together.
+- **Export:** `deploy/export-subscribers.sh > ~/Downloads/hopnosis-subscribers.csv`. Use `--count` to get just the numbers. The file holds personal data, so don't commit it.
+- **Not built yet:** unsubscribing is handled by whatever tool sends the emails later. Import from the CSV, and remove anyone who unsubscribes from the database too.
+- **Preview copy:** the sign-up form only works on the server. On the GitHub Pages copy it shows "That didn't go through".
+
 ## Deploy
 **Production: https://quiz.hopnosis.co.za** runs on the PowerHER Xneelo VM (`154.65.107.108`), set up the same way as Pulse's staging and production:
 - **Folders:** `/var/www/quiz.hopnosis.co.za/` holds `releases/<timestamp>`, a `current` symlink, and `shared/` (`config`, `data`, `backups`).
