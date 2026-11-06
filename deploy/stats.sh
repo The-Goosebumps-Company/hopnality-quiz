@@ -25,27 +25,27 @@ if [ -n "${1:-}" ]; then
 fi
 
 ssh -o BatchMode=yes "$HOST" "sudo mariadb hopnosis --table -e \"
-SELECT COUNT(*) AS started, SUM(finished_at IS NOT NULL) AS finished,
-       CONCAT(ROUND(100 * SUM(finished_at IS NOT NULL) / NULLIF(COUNT(*), 0)), '%') AS completion,
-       SUM(tiebreak IS NOT NULL) AS tiebreaks
+SELECT COUNT(*) AS started, COALESCE(SUM(finished_at IS NOT NULL), 0) AS finished,
+       COALESCE(CONCAT(ROUND(100 * COALESCE(SUM(finished_at IS NOT NULL), 0) / NULLIF(COUNT(*), 0)), '%'), '-') AS completion,
+       COALESCE(SUM(tiebreak IS NOT NULL), 0) AS tiebreaks
 FROM results WHERE $WHERE;
 
 SELECT flavour, COUNT(*) AS results, CONCAT(ROUND(100 * COUNT(*) / SUM(COUNT(*)) OVER ()), '%') AS share
 FROM results WHERE $WHERE AND flavour IS NOT NULL GROUP BY flavour ORDER BY results DESC;
 
 SELECT COUNT(nailed) AS answered_nail_it,
-       SUM(nailed = flavour) AS quiz_was_right,
-       SUM(nailed = 'untried') AS havent_tried,
-       CONCAT(ROUND(100 * SUM(nailed = flavour) / NULLIF(SUM(nailed IS NOT NULL AND nailed <> 'untried'), 0)), '%') AS hit_rate
+       COALESCE(SUM(nailed = flavour), 0) AS quiz_was_right,
+       COALESCE(SUM(nailed = 'untried'), 0) AS havent_tried,
+       COALESCE(CONCAT(ROUND(100 * COALESCE(SUM(nailed = flavour), 0) / NULLIF(COALESCE(SUM(nailed IS NOT NULL AND nailed <> 'untried'), 0), 0)), '%'), '-') AS hit_rate
 FROM results WHERE $WHERE;
 
 SELECT nailed AS actual_favourite, COUNT(*) AS people FROM results
 WHERE $WHERE AND nailed IS NOT NULL GROUP BY nailed ORDER BY people DESC;
 
-SELECT SUM(shares > 0) AS runs_shared, SUM(squares > 0) AS runs_saved_square,
-       SUM(shop_clicks > 0) AS runs_clicked_shop, SUM(mix_clicks > 0) AS runs_clicked_mixed,
-       SUM(optins > 0) AS runs_opted_in,
-       CONCAT(ROUND(100 * SUM(optins > 0) / NULLIF(SUM(finished_at IS NOT NULL), 0)), '%') AS optin_rate
+SELECT COALESCE(SUM(shares > 0), 0) AS runs_shared, COALESCE(SUM(squares > 0), 0) AS runs_saved_square,
+       COALESCE(SUM(shop_clicks > 0), 0) AS runs_clicked_shop, COALESCE(SUM(mix_clicks > 0), 0) AS runs_clicked_mixed,
+       COALESCE(SUM(optins > 0), 0) AS runs_opted_in,
+       COALESCE(CONCAT(ROUND(100 * COALESCE(SUM(optins > 0), 0) / NULLIF(COALESCE(SUM(finished_at IS NOT NULL), 0), 0)), '%'), '-') AS optin_rate
 FROM results WHERE $WHERE;
 
 SELECT COALESCE(source, '(none)') AS source, COUNT(*) AS runs FROM results WHERE $WHERE GROUP BY source ORDER BY runs DESC;
@@ -53,11 +53,11 @@ SELECT COALESCE(source, '(none)') AS source, COUNT(*) AS runs FROM results WHERE
 SELECT age_band, COUNT(*) AS people FROM results WHERE $WHERE AND age_band IS NOT NULL GROUP BY age_band ORDER BY age_band;
 SELECT city, COUNT(*) AS people FROM results WHERE $WHERE AND city IS NOT NULL GROUP BY city ORDER BY people DESC;
 
-SELECT 'supermarket' AS channel, SUM(FIND_IN_SET('supermarket', channels) > 0) AS people FROM results WHERE $WHERE
-UNION ALL SELECT 'gym or padel', SUM(FIND_IN_SET('gym', channels) > 0) FROM results WHERE $WHERE
-UNION ALL SELECT 'restaurants and bars', SUM(FIND_IN_SET('bars', channels) > 0) FROM results WHERE $WHERE
-UNION ALL SELECT 'petrol or convenience', SUM(FIND_IN_SET('convenience', channels) > 0) FROM results WHERE $WHERE
-UNION ALL SELECT 'festivals and events', SUM(FIND_IN_SET('events', channels) > 0) FROM results WHERE $WHERE
-UNION ALL SELECT 'online', SUM(FIND_IN_SET('online', channels) > 0) FROM results WHERE $WHERE
+SELECT 'supermarket' AS channel, COALESCE(SUM(FIND_IN_SET('supermarket', channels) > 0), 0) AS people FROM results WHERE $WHERE
+UNION ALL SELECT 'gym or padel', COALESCE(SUM(FIND_IN_SET('gym', channels) > 0), 0) FROM results WHERE $WHERE
+UNION ALL SELECT 'restaurants and bars', COALESCE(SUM(FIND_IN_SET('bars', channels) > 0), 0) FROM results WHERE $WHERE
+UNION ALL SELECT 'petrol or convenience', COALESCE(SUM(FIND_IN_SET('convenience', channels) > 0), 0) FROM results WHERE $WHERE
+UNION ALL SELECT 'festivals and events', COALESCE(SUM(FIND_IN_SET('events', channels) > 0), 0) FROM results WHERE $WHERE
+UNION ALL SELECT 'online', COALESCE(SUM(FIND_IN_SET('online', channels) > 0), 0) FROM results WHERE $WHERE
 ORDER BY people DESC;
 \""
