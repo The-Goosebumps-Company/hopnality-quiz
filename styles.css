@@ -285,6 +285,11 @@ body.event-look:not([data-flavour]) .bubbles span { box-shadow: 0 0 6px var(--ne
 .loading__hop { font-size: 40px; line-height: 1; animation: flicker 4s steps(1) 1.2s infinite; }
 
 /* Plain hopnøsis look (event off): no swirls or bubbles, neon becomes a soft gold glow. */
+/* Loading line in the brand face (Jost), gold, steady: the neon script is event-only. */
+body:not(.event-look) .loading__hop {
+  font-family: var(--font); font-size: 24px; font-weight: 700; letter-spacing: -.01em;
+  color: #cc8a00; text-shadow: none; animation: none;
+}
 /* Bubbles stay (in brand gold); the purple-cyan swirls are event-only. */
 body:not(.event-look) .swirl { display: none; }
 body:not(.event-look) .bubble { border-color: #cc8a00; box-shadow: 0 0 6px rgba(204, 138, 0, .45); }
