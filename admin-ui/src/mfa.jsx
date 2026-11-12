@@ -59,7 +59,7 @@ function Shell({ title, intro, children, onCancel, pending }) {
       <div className="w-full max-w-md rounded-2xl border border-theme-border-primary bg-theme-bg-secondary p-8 shadow-theme-lg animate-in fade-in zoom-in-95 duration-300">
         <div className="flex items-center gap-2">
           <img src="/assets/logo-black-gold.png" alt="hopnøsis" className="h-9 w-auto" />
-          <span className="text-[9px] font-semibold uppercase leading-tight tracking-[.2em] text-theme-text-muted">What the AF<br />quiz · admin</span>
+          <span className="text-[9px] font-semibold uppercase leading-tight tracking-[.2em] text-theme-text-muted">Hop-nality<br />quiz · admin</span>
         </div>
         <div className="mt-8 flex items-center gap-3">
           <span className="grid h-10 w-10 place-items-center rounded-xl bg-accent-soft text-accent-strong"><ShieldCheck size={22} weight="duotone" /></span>

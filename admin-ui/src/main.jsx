@@ -89,7 +89,7 @@ function Shell({ me, current, signOut, children }) {
           {open && <span className="text-[9px] font-semibold uppercase leading-tight tracking-[.2em] text-theme-text-muted">Quiz<br />admin</span>}
         </a>
         <nav aria-label="Main" className="flex-1 space-y-0.5 overflow-y-auto p-3 scrollbar-thin">
-          {open && <p className="px-3 pb-1.5 pt-1 text-xs font-semibold uppercase tracking-wider text-theme-text-muted">What the AF are you?</p>}
+          {open && <p className="px-3 pb-1.5 pt-1 text-xs font-semibold uppercase tracking-wider text-theme-text-muted">What's your hop-nality?</p>}
           {items.map((item) => <NavItem key={item.key} item={item} current={current} open={open} counts={live.counts} />)}
         </nav>
         <div className="space-y-2 border-t border-theme-border-primary p-3">
@@ -117,7 +117,7 @@ function Shell({ me, current, signOut, children }) {
         <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-4 border-b border-theme-border-primary bg-theme-bg-secondary px-4 md:h-auto md:px-8 md:py-4">
           <div className="min-w-0">
             <p className="hidden text-[10px] font-semibold uppercase tracking-[.25em] text-theme-text-muted md:block">hopnøsis · House of Hops</p>
-            <p className="truncate font-display text-lg md:text-xl text-theme-text-primary">What the AF are you? <span className="text-theme-text-muted font-normal">· quiz admin</span></p>
+            <p className="truncate font-display text-lg md:text-xl text-theme-text-primary">What's your hop-nality? <span className="text-theme-text-muted font-normal">· quiz admin</span></p>
           </div>
           <div className="flex items-center gap-3"><LiveChip /></div>
         </header>

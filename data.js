@@ -1,4 +1,4 @@
-// Quiz content. Source of truth: the client brief "WHAT THE AF ARE YOU?"
+// Quiz content. Questions and archetypes from the client brief "WHAT THE AF ARE YOU?"; public title "What's your hop-nality?" (12 Nov)
 // (context/creative-brief-nov-2026.md). Questions, archetypes, result lines and the opening are
 // the brief's own copy. Anything marked DRAFT is ours and needs sign-off (see the copy doc).
 
@@ -7,7 +7,7 @@ const SHOP = "https://hopnosis.co.za/products/";
 
 window.HOPNALITY = {
   welcome: {
-    title: "What the AF are you?",
+    title: "What's your hop-nality?",
     body: "Three flavours. Three personalities. One questionable sense of self-awareness. Seven questions. No wrong answers. Some mildly concerning revelations.",
   },
 
@@ -151,7 +151,10 @@ window.HOPNALITY = {
 
   // Event badge on the welcome screen ("The House of Hops", as on Kelly's PowerHER menu).
   // Set on: false after the event and the welcome screen goes back to plain.
-  event: { on: true, where: "PowerHER Fit Fest" },
+  event: { on: false, where: "PowerHER Fit Fest" }, // on = House of Hops neon look + event label (PowerHER, 7 Nov)
+
+  // Optional panels under the result. Off = only "Join the Hopnotised" stays.
+  panels: { nail: false, mixed: false, insight: false },
 
   heroLine: "A drink that behaves. Even if you don't.",
   signOff: "SIP HAPPENS™",

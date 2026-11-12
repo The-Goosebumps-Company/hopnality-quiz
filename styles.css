@@ -193,19 +193,20 @@ body[data-flavour="mango"] .join__status.is-error, body[data-flavour="lime"] .jo
    hop pattern at ~7%, rising cyan bubble rings, an occasional neon flicker.
    Applies before a result is shown (welcome, questions, loading); results keep flavour themes. */
 :root { --neon-pink: #ff54d6; --neon-cyan: #3cd6e2; --hop-purple: #7c4eac; }
-body:not([data-flavour]) {
+body.event-look:not([data-flavour]) {
   --bg: #080808; --accent: var(--neon-cyan); --accent-ink: #061012; --line: rgba(60, 214, 226, .28);
 }
-body:not([data-flavour]) :focus-visible { outline-color: var(--neon-cyan); }
+body.event-look:not([data-flavour]) :focus-visible { outline-color: var(--neon-cyan); }
 
-/* Hop pattern behind everything: purple before the result, flavour ink after. */
+/* Hop pattern behind everything: gold (purple in the event look), flavour ink on results. */
 body::before {
   content: ""; position: fixed; inset: -60px; z-index: -1; pointer-events: none;
-  background: var(--hop-purple); opacity: .09;
+  background: var(--accent); opacity: .07;
   -webkit-mask: url("assets/hop-pattern.png") center / 640px auto repeat;
           mask: url("assets/hop-pattern.png") center / 640px auto repeat;
   animation: pattern-drift 100s linear infinite;
 }
+body.event-look:not([data-flavour])::before { background: var(--hop-purple); opacity: .09; }
 body[data-flavour]::before { background: var(--ink); opacity: .05; }
 @keyframes pattern-drift {
   0% { transform: translate(60px, 0); } 25% { transform: translate(0, 60px); }
@@ -278,10 +279,21 @@ body[data-flavour]::before { background: var(--ink); opacity: .05; }
 }
 
 /* Question and loading screens in event colours */
-body:not([data-flavour]) .progress__bar { box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan); }
-body:not([data-flavour]) .answer.is-picked { box-shadow: 0 0 12px rgba(60, 214, 226, .55); }
-body:not([data-flavour]) .bubbles span { box-shadow: 0 0 6px var(--neon-cyan); }
+body.event-look:not([data-flavour]) .progress__bar { box-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan); }
+body.event-look:not([data-flavour]) .answer.is-picked { box-shadow: 0 0 12px rgba(60, 214, 226, .55); }
+body.event-look:not([data-flavour]) .bubbles span { box-shadow: 0 0 6px var(--neon-cyan); }
 .loading__hop { font-size: 40px; line-height: 1; animation: flicker 4s steps(1) 1.2s infinite; }
+
+/* Plain hopnøsis look (event off): no swirls or bubbles, neon becomes a soft gold glow. */
+body:not(.event-look) .fx { display: none; }
+body:not(.event-look) .neon {
+  color: #cc8a00; animation: none;
+  text-shadow: 0 0 18px rgba(204, 138, 0, .35);
+}
+body:not(.event-look) .neon-script {
+  color: #e2b04a; text-shadow: 0 0 12px rgba(204, 138, 0, .35);
+}
+body:not(.event-look) .btn--glow { box-shadow: 0 0 22px rgba(204, 138, 0, .3); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

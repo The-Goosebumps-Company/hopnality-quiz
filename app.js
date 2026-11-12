@@ -316,7 +316,7 @@
     if (story) {
       ctx.font = `700 40px ${FONT}`;
       ctx.letterSpacing = "8px";
-      ctx.fillText("WHAT THE AF AM I?", W / 2, 180);
+      ctx.fillText("MY HOP-NALITY IS", W / 2, 180);
       ctx.letterSpacing = "0px";
     }
 
@@ -361,7 +361,7 @@
 
   function shareText() {
     const f = flavours[state.result];
-    return `I'm ${f.name}, ${f.archetype}. ${f.line} What the AF are you? ${location.origin}${location.pathname} ${handle} ${hashtags}`;
+    return `I'm ${f.name}, ${f.archetype}. ${f.line} What's your hop-nality? ${location.origin}${location.pathname} ${handle} ${hashtags}`;
   }
 
   function download(blob, name) {
@@ -473,10 +473,17 @@
 
   // ---------- Wiring ----------
   $(".lede").textContent = H.welcome.body;
-  if (H.event && H.event.on) {
+  // Event look (House of Hops neon, PowerHER) vs the plain hopnøsis black-and-gold.
+  document.body.classList.toggle("event-look", !!H.event?.on);
+  if (H.event?.on) {
     $(".event__where").textContent = H.event.where || "";
     $(".event").hidden = false;
   }
+  // Optional result panels; with all off only the email sign-up remains.
+  const panels = H.panels || {};
+  $(".nail").hidden = panels.nail === false;
+  $(".mixed").hidden = panels.mixed === false;
+  $(".insight").hidden = panels.insight === false;
   buildChips();
 
   document.addEventListener("click", (e) => {

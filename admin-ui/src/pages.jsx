@@ -93,7 +93,7 @@ export function Overview() {
   const o = useLiveApi('overview', params);
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
-      <PageHead eyebrow="What the AF are you? · live" title="Overview" sub="Who’s taking the quiz, what they get, and what they do next. Updates every 10 seconds.">
+      <PageHead eyebrow="What’s your hop-nality? · live" title="Overview" sub="Who’s taking the quiz, what they get, and what they do next. Updates every 10 seconds.">
         <Filters filters={filters} setFilters={setFilters} />
         <ExportButton kind="runs" label="Quiz data (CSV)" params={params} />
       </PageHead>
