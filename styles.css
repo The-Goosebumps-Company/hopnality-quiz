@@ -285,7 +285,9 @@ body.event-look:not([data-flavour]) .bubbles span { box-shadow: 0 0 6px var(--ne
 .loading__hop { font-size: 40px; line-height: 1; animation: flicker 4s steps(1) 1.2s infinite; }
 
 /* Plain hopnøsis look (event off): no swirls or bubbles, neon becomes a soft gold glow. */
-body:not(.event-look) .fx { display: none; }
+/* Bubbles stay (in brand gold); the purple-cyan swirls are event-only. */
+body:not(.event-look) .swirl { display: none; }
+body:not(.event-look) .bubble { border-color: #cc8a00; box-shadow: 0 0 6px rgba(204, 138, 0, .45); }
 body:not(.event-look) .neon {
   color: #cc8a00; animation: none;
   text-shadow: 0 0 18px rgba(204, 138, 0, .35);
